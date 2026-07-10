@@ -1,4 +1,4 @@
-# iter-05：Makefile 快捷命令封装
+# skill-05：Makefile 快捷命令封装（iter-05 归档）
 
 ## 迭代目标
 
@@ -50,4 +50,3 @@ d8e40bd feat: 新增 Makefile 封装 build/test/cov/lint/bump 等快捷命令
 
 1. **README 冲突**：每次 copier update 改模板 README 时都会整体冲突，需手动 `git checkout --ours README.md`。长期可考虑把模板 README 改名（如 `PROJECT_README.md`）或在 copier.yml 用 `_skip_if_exists` 配置，但会影响生成项目的默认 README。
 2. **rule-01 需求分析**：从模板同步的"需求分析"段要求迭代前确认需求并记录到 `.trae/req/`。本次迭代在上下文恢复时承接，未单独创建 req 文档。后续迭代需遵守此规则。
-3. **归档清理**：iter-05 是第 5 次迭代，按 rule-01 应清理 `.trae/docs/` 归档到 `.trae/skills/`。
