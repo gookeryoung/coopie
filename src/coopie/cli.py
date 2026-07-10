@@ -24,6 +24,7 @@ def main():
         "copier",
         "copy",
         "--trust",
+        "--data", f"project_name={args.project_name}",
         "https://github.com/gookeryoung/coopie",
         str(dest_dir),
     ]
