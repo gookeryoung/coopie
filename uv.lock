@@ -289,7 +289,7 @@ wheels = [
 
 [[package]]
 name = "coopie"
-version = "0.1.14"
+version = "0.2.0"
 source = { editable = "." }
 dependencies = [
     { name = "typing-extensions", version = "4.13.2", source = { registry = "https://mirrors.aliyun.com/pypi/simple/" }, marker = "python_full_version < '3.9'" },
