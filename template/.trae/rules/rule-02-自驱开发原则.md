@@ -53,11 +53,11 @@ alwaysApply: true
 
   ```bash
   uv run ruff check src tests
-  uv run pytest -m "not slow" --cov={{ package_name }} --cov-fail-under={{ coverage_fail_under }}
+  uv run pytest -m "not slow" --cov=coopie --cov-fail-under=95
   ```
 
 - 测试失败时定位根因再修复，不通过放宽断言或 `# pragma: no cover` 绕过。
-- 覆盖率不得低于上一次的值（项目门槛 {{ coverage_fail_under }}%，branch）。
+- 覆盖率不得低于上一次的值（项目门槛 95%，branch）。
 
 ### 4. 文档（Docs）
 
