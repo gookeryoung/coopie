@@ -2,6 +2,12 @@
 
 > 基于 [copier](https://copier.readthedocs.io/) 的通用 Python 项目模板。
 
+[![CI](https://github.com/gookeryoung/coopie/actions/workflows/ci.yml/badge.svg)](https://github.com/gookeryoung/coopie/actions/workflows/ci.yml)
+[![PyPI](https://img.shields.io/pypi/v/coopie)](https://pypi.org/project/coopie/)
+[![Python](https://img.shields.io/badge/python-3.8%2B-blue.svg)](https://www.python.org/)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Coverage](https://img.shields.io/badge/coverage-%E2%89%A595%25-brightgreen.svg)](https://github.com/gookeryoung/coopie/actions/workflows/ci.yml)
+
 基于 [pyflowx](https://github.com/gookeryoung/pyflowx) 项目实践，生成开箱即用的 Python 项目骨架。
 
 ## 特性
@@ -21,28 +27,38 @@
 
 ### 创建新项目
 
+coopie 既是模板又是 CLI 工具，封装了 `copier copy`，自动从 git 配置读取作者信息：
+
 ```bash
-# 方式一：uvx（推荐，无需预装）
-uvx copier copy f:\Dev\coopie my-new-project
+# 推荐：通过 coopie CLI（自动填充 author_name/author_email）
+uvx coopie my-new-project
 
-# 方式二：pip
-pip install copier
-copier copy f:\Dev\coopie my-new-project
-
-# 从 git 仓库创建（推送到远程后）
+# 或直接调用 copier（需手动传 --data author_name=...）
 uvx copier copy https://github.com/gookeryoung/coopie.git my-new-project
 ```
 
 ### 更新已有项目
 
-当模板更新后，可在已生成的项目目录中运行：
+当模板更新后，在已生成的项目目录中运行：
 
 ```bash
 cd my-new-project
-uvx copier update
+coopie -U              # 等价于 copier update
+coopie -U -A           # 跳过所有问题（使用上次答案）
+coopie -U -T           # 跳过所有任务
 ```
 
 Copier 会读取 `.copier-answers.yml` 中的上一次答案，对比模板差异，增量合并更新。
+
+### CLI 选项
+
+| 选项 | 说明 |
+|------|------|
+| `coopie <project_name>` | 创建新项目 |
+| `coopie -U` / `--update` | 更新当前目录中的已生成项目 |
+| `coopie -A` / `--skip-answered` | 跳过所有问题（使用默认值或上次答案） |
+| `coopie -T` / `--skip-tasks` | 跳过所有任务 |
+| `coopie -V` / `--version` | 显示版本号 |
 
 ## 可配置选项
 
@@ -111,6 +127,18 @@ uv run pytest                # 运行测试
 git init                     # 初始化 git 仓库
 git add -A
 git commit -m "feat: 初始化项目"
+```
+
+### Make 快捷命令
+
+生成的项目自带 Makefile，封装常用操作，运行 `make help` 查看全部命令：
+
+```bash
+make sync     # 安装开发依赖
+make check    # 全套门禁 (lint + typecheck + cov)
+make build    # 构建分发包
+make clean    # 清理构建产物
+make bump PART=patch  # 版本号 bump
 ```
 
 ## 设计依据

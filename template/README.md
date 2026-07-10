@@ -2,10 +2,22 @@
 
 > {{ description }}
 
+[![PyPI](https://img.shields.io/pypi/v/{{ package_name }})](https://pypi.org/project/{{ package_name }}/)
 {% if use_cicd %}[![CI]({{ "https://github.com/" ~ author_name ~ "/" ~ project_name ~ "/actions/workflows/ci.yml/badge.svg" }})]({{ "https://github.com/" ~ author_name ~ "/" ~ project_name ~ "/actions/workflows/ci.yml" }})
 {% endif %}![Python](https://img.shields.io/badge/python-{{ min_python_version }}%2B-blue.svg)
 {% if license != "None" %}![License](https://img.shields.io/badge/license-{{ license }}-green.svg)
 {% endif %}![Coverage](https://img.shields.io/badge/coverage-%E2%89%A5{{ coverage_fail_under }}%25-brightgreen.svg)
+
+## 特性
+
+- **构建工具链**：hatchling + uv + ruff + pyrefly + pytest + coverage
+- **Python 版本**：{{ min_python_version }} ~ {{ max_python_version }}
+- **代码质量**：pre-commit 钩子 + ruff lint/format，覆盖率阈值 {{ coverage_fail_under }}%
+{% if use_cicd %}- **CI/CD**：GitHub Actions（lint + typecheck + 多版本测试 + 自动发布到 PyPI）
+{% endif %}{% if use_docs %}- **文档**：Sphinx + ReadTheDocs（中文 zh_CN）
+{% endif %}{% if use_tox %}- **多版本测试**：tox + tox-uv（{{ tox_envlist }}）
+{% endif %}{% if use_docker %}- **容器化**：Dockerfile（含国内镜像源配置）
+{% endif %}- **项目结构**：src layout + py.typed 类型标记
 
 ## 安装
 
