@@ -15,10 +15,10 @@ jobs:
     name: Lint & Typecheck
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v3
+        uses: astral-sh/setup-uv@v6
         with:
           enable-cache: true
 
@@ -32,7 +32,7 @@ jobs:
         run: uv run ruff format --check src tests
 
       - name: Pyrefly check
-        run: uv run pyrefly check .
+        run: uv run pyrefly check
 
   test:
     name: Test (Python {{ ci_test_versions[0] }} & {{ ci_test_versions[-1] }})
@@ -41,10 +41,10 @@ jobs:
       matrix:
         python-version: [{% for v in ci_test_versions %}"{{ v }}"{% if not loop.last %}, {% endif %}{% endfor %}]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v3
+        uses: astral-sh/setup-uv@v6
         with:
           enable-cache: true
 
