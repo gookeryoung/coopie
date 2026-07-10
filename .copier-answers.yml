@@ -1,0 +1,19 @@
+# Changes here will be overwritten by Copier
+_commit: 298f2f8
+_src_path: https://github.com/gookeryoung/coopie
+author_email: gooker_young@qq.com
+author_name: gooker_young
+coverage_fail_under: 95
+description: 基于 [copier](https://copier.readthedocs.io/) 的通用 Python 项目模板。
+license: MIT
+max_python_version: '3.14'
+min_python_version: '3.8'
+package_name: coopie
+project_name: coopie
+pypi_token_secret: PYPI_TOKEN
+use_cicd: true
+use_docker: true
+use_docs: true
+use_domestic_mirrors: true
+use_tox: true
+
