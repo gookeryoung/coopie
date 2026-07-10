@@ -21,12 +21,35 @@ def _get_git_config(key: str) -> str | None:
 
 
 def main():
-    """主函数，解析命令行参数并创建新项目."""
-    parser = argparse.ArgumentParser(
-        description="Create a new Python project from a template."
+    """主函数，解析命令行参数并创建或更新项目."""
+    parser = argparse.ArgumentParser(description="Create a new Python project from a template.")
+    parser.add_argument(
+        "project_name",
+        type=str,
+        nargs="?",
+        help="Name of the new project.",
     )
-    parser.add_argument("project_name", type=str, help="Name of the new project.")
+    parser.add_argument(
+        "--update",
+        "-U",
+        action="store_true",
+        help="更新当前目录中已生成的项目模板",
+    )
     args = parser.parse_args()
+
+    if args.update:
+        if args.project_name:
+            parser.error("project_name 与 --update 互斥")
+        cmd = [
+            "uvx",
+            "--with",
+            "jinja2-time",
+            "copier",
+            "update",
+            "--trust",
+        ]
+        subprocess.run(cmd, check=True)
+        return
 
     if not args.project_name:
         parser.error("project_name is required")
@@ -41,7 +64,8 @@ def main():
         "copier",
         "copy",
         "--trust",
-        "--data", f"project_name={args.project_name}",
+        "--data",
+        f"project_name={args.project_name}",
     ]
 
     author_name = _get_git_config("user.name")
@@ -52,4 +76,4 @@ def main():
         cmd.extend(["--data", f"author_email={author_email}"])
 
     cmd.extend(["https://github.com/gookeryoung/coopie", str(dest_dir)])
-    subprocess.run(cmd)
+    subprocess.run(cmd, check=True)
