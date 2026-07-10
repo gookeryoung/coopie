@@ -63,8 +63,7 @@ make bump PART=patch  # 版本号 bump
 
 ```bash
 # 本地构建文档
-uv sync --extra docs
-uv run sphinx-build -b html docs docs/_build/html
+make doc
 ```
 {% endif %}
 {% if use_tox %}
@@ -73,7 +72,7 @@ uv run sphinx-build -b html docs docs/_build/html
 使用 tox 在多个 Python 版本（{{ tox_envlist }}）下运行测试：
 
 ```bash
-uvx tox run
+make tox
 ```
 {% endif %}
 ## 许可证
