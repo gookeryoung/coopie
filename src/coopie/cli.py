@@ -30,6 +30,8 @@ def _get_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Create a new Python project from a template.")
     parser.add_argument("project_name", type=str, nargs="?", help="Name of the new project.")
     parser.add_argument("--update", "-U", action="store_true", help="更新当前目录中已生成的项目模板")
+    parser.add_argument("--skip-answered", "-A", action="store_true", help="跳过所有问题，默认值为 False")
+    parser.add_argument("--skip-tasks", "-T", action="store_true", help="跳过所有任务，默认值为 False")
     parser.add_argument("-V", "--version", action="version", version=f"%(prog)s {__version__}")
     return parser.parse_args()
 
@@ -47,19 +49,18 @@ def main() -> None:
     try:
         if args.update:
             cmd = ["uvx", "copier", "update"]
+            if args.skip_answered:
+                cmd.append("--skip-answered")
+            if args.skip_tasks:
+                cmd.append("--skip-tasks")
+
             subprocess.run(cmd, check=True)
             return
 
         dest_dir = Path.cwd() / args.project_name.replace("-", "_")
         dest_dir.mkdir(parents=True, exist_ok=True)
 
-        cmd = [
-            "uvx",
-            "copier",
-            "copy",
-            "--data",
-            f"project_name={args.project_name}",
-        ]
+        cmd = ["uvx", "copier", "copy", "--data", f"project_name={args.project_name}"]
 
         author_name = _get_git_config("user.name")
         if author_name:
