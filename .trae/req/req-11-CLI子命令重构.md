@@ -11,5 +11,5 @@
 [x] 7. README.md 更新 CLI 用法为子命令
 [x] 8. docs/index.rst 同步更新用法
 [x] 9. ruff/pyrefly/pytest 全绿，覆盖率 >= 95%（实际 100%）
-[] 10. copier update 验证无冲突
+[x] 10. copier update 验证无冲突（_commit v0.2.2→v0.2.3，无文件冲突）
 [] 11. bump + push
