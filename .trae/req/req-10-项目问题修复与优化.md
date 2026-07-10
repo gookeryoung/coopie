@@ -12,5 +12,5 @@
 [x] 8. docs/index.rst 修正 make bump 用法
 [x] 9. 更新 uv.lock 同步依赖变更
 [x] 10. make check 全绿，覆盖率不下降（100%）
-[] 11. copier update 验证无冲突
+[x] 11. copier update 验证无冲突（Keeping template version 0.2.2）
 [] 12. iter-10 文档与 bump
