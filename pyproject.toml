@@ -18,7 +18,7 @@ dependencies = ["typing-extensions>=4.13.2; python_version < '3.13'"]
 description = "基于 [copier](https://copier.readthedocs.io/) 的通用 Python 项目模板。"
 readme = "README.md"
 requires-python = ">=3.8"
-version = "0.1.1"
+version = "0.1.2"
 
 [project.optional-dependencies]
 dev = [
