@@ -5,12 +5,11 @@ classifiers = [
 {% for v in supported_py_versions %}    "Programming Language :: Python :: {{ v }}",
 {% endfor %}    "Topic :: Software Development :: Libraries :: Python Modules",
 ]
-dependencies = [
-    "typing-extensions>=4.13.2; python_version < '3.13'",
-]
-description = "{{ description }}"
+
 {% if license != "None" %}license = "{{ license }}"
 {% endif %}name = "{{ package_name }}"
+dependencies = ["typing-extensions>=4.13.2; python_version < '3.13'"]
+description = "{{ description }}"
 readme = "README.md"
 requires-python = ">={{ min_python_version }}"
 version = "0.1.0"
@@ -34,14 +33,15 @@ dev = [
 {% endif %}
 [build-system]
 build-backend = "hatchling.build"
-requires      = ["hatchling"]
+requires = ["hatchling"]
 
+{% if use_domestic_mirrors %}
 [tool.uv]
 required-version = ">=0.5.0"
-{% if use_domestic_mirrors %}
 [[tool.uv.index]]
 default = true
-url     = "https://mirrors.aliyun.com/pypi/simple/"
+url = "https://mirrors.aliyun.com/pypi/simple/"
+
 {% endif %}
 [tool.hatch.build.targets.wheel]
 packages = ["src/{{ package_name }}"]
@@ -53,28 +53,28 @@ packages = ["src/{{ package_name }}"]
 dev = ["{{ package_name }}[dev{% if use_docs %},docs{% endif %}]"]
 
 [tool.coverage.run]
-branch      = true
+branch = true
 concurrency = ["thread"]
-omit        = ["tests/*"]
-source      = ["{{ package_name }}"]
+omit = ["tests/*"]
+source = ["{{ package_name }}"]
 
 [tool.coverage.report]
+fail_under = {{ coverage_fail_under }}
 exclude_lines = [
     "if TYPE_CHECKING:",
     "if __name__ == .__main__.:",
     "pragma: no cover",
     "raise NotImplementedError",
 ]
-fail_under = {{ coverage_fail_under }}
 show_missing = true
 
 [tool.pytest.ini_options]
 asyncio_default_fixture_loop_scope = "function"
-markers                            = ["slow: marks tests as slow (deselect with '-m \"not slow\"')"]
+markers = ["slow: marks tests as slow (deselect with '-m \"not slow\"')"]
 
 # Ruff 配置 - 与 .pre-commit-config.yaml 保持一致
 [tool.ruff]
-line-length    = 120
+line-length = 120
 target-version = "{{ target_py }}"
 
 [tool.ruff.lint]
@@ -108,7 +108,7 @@ select = [
 "**/tests/**" = ["ARG001", "ARG002"]
 
 [tool.pyrefly]
-preset           = "strict"
+preset = "strict"
 project-includes = ["**/*.ipynb", "**/*.py*"]
-python-version   = "{{ min_python_version }}"
-search-path      = ["."]
+python-version = "{{ min_python_version }}"
+search-path = ["."]
