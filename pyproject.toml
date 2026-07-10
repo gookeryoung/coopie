@@ -84,6 +84,7 @@ testpaths                          = ["tests"]
 
 # Ruff 配置 - 与 .pre-commit-config.yaml 保持一致
 [tool.ruff]
+extend-exclude = ["template"]
 line-length    = 120
 target-version = "py38"
 
