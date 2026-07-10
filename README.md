@@ -24,16 +24,26 @@
 
 ## 用法
 
+coopie 既是模板又是 CLI 工具，封装了 `copier copy/update`，自动从 git 配置读取作者信息。采用子命令模式：
+
 ### 创建新项目
 
-coopie 既是模板又是 CLI 工具，封装了 `copier copy`，自动从 git 配置读取作者信息：
+在子目录中新建项目（自动填充 author_name/author_email）：
 
 ```bash
-# 推荐：通过 coopie CLI（自动填充 author_name/author_email）
-uvx coopie my-new-project
+coopie new my-new-project
 
 # 或直接调用 copier（需手动传 --data author_name=...）
 uvx copier copy https://github.com/gookeryoung/coopie.git my-new-project
+```
+
+### 在当前目录初始化项目
+
+在已有目录中初始化（project_name 从当前目录名派生）：
+
+```bash
+cd existing-dir
+coopie init          # 非空目录会提示确认（y/N）
 ```
 
 ### 更新已有项目
@@ -42,21 +52,30 @@ uvx copier copy https://github.com/gookeryoung/coopie.git my-new-project
 
 ```bash
 cd my-new-project
-coopie -U              # 等价于 copier update
-coopie -U -A           # 跳过所有问题（使用上次答案）
-coopie -U -T           # 跳过所有任务
+coopie update         # 等价于 copier update
+coopie update -A      # 跳过所有问题（使用上次答案）
+coopie update -T      # 跳过所有任务
 ```
 
 Copier 会读取 `.copier-answers.yml` 中的上一次答案，对比模板差异，增量合并更新。
 
-### CLI 选项
+### 模拟检查更新冲突
 
-| 选项 | 说明 |
+dry-run 模式，模拟更新过程但不修改文件，用于检查是否会产生冲突：
+
+```bash
+coopie test           # 等价于 copier update --pretend
+coopie test -A -T     # 跳过所有问题和任务
+```
+
+### CLI 子命令
+
+| 命令 | 说明 |
 |------|------|
-| `coopie <project_name>` | 创建新项目 |
-| `coopie -U` / `--update` | 更新当前目录中的已生成项目 |
-| `coopie -A` / `--skip-answered` | 跳过所有问题（使用默认值或上次答案） |
-| `coopie -T` / `--skip-tasks` | 跳过所有任务 |
+| `coopie new <project_name>` | 新建项目（建立子文件夹） |
+| `coopie init` | 在当前目录初始化项目 |
+| `coopie update [-A] [-T]` | 更新当前目录中的已生成项目模板 |
+| `coopie test [-A] [-T]` | 模拟检查模板更新是否产生冲突 |
 | `coopie -V` / `--version` | 显示版本号 |
 
 ## 可配置选项

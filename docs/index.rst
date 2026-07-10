@@ -54,19 +54,31 @@ coopie
 用法
 ====
 
-创建新项目::
+coopie 既是模板又是 CLI 工具，封装了 ``copier copy/update``，自动从 git 配置读取作者信息。采用子命令模式。
 
-   # 通过 coopie CLI（自动从 git 配置读取作者信息）
-   uvx coopie my-new-project
+创建新项目（在子目录中新建）::
+
+   coopie new my-new-project
 
    # 或直接调用 copier
    uvx copier copy https://github.com/gookeryoung/coopie.git my-new-project
 
+在当前目录初始化项目（project_name 从目录名派生）::
+
+   cd existing-dir
+   coopie init           # 非空目录会提示确认（y/N）
+
 更新已有项目::
 
    cd my-new-project
-   coopie -U              # 等价于 copier update
-   coopie -U -A           # 跳过所有问题
+   coopie update         # 等价于 copier update
+   coopie update -A      # 跳过所有问题
+   coopie update -T      # 跳过所有任务
+
+模拟检查更新冲突（dry-run，不修改文件）::
+
+   coopie test           # 等价于 copier update --pretend
+   coopie test -A -T     # 跳过所有问题和任务
 
 快速上手
 ========
