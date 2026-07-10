@@ -13,7 +13,7 @@ package_name: coopie
 project_name: coopie
 use_cicd: true
 use_cli: true
-use_docker: true
+use_docker: false
 use_docs: true
 use_domestic_mirrors: true
 use_tox: true
