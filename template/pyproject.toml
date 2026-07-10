@@ -124,7 +124,7 @@ search-path      = ["."]
 current_version = "{{ initial_version }}"
 commit = true
 exclude = ["template/*"]
-message = "chore: bump version {current_version} → {new_version}"
+message = "chore: 更新版本 {current_version} → {new_version}"
 tag = true
 tag_name = "v{new_version}"
 
