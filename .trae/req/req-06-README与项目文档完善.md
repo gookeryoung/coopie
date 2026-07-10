@@ -15,7 +15,7 @@
 ## 需求清单
 
 - [x] 需求确认：badge 两者都做、README 两者都完善
-- [ ] 完善项目根 README.md：补充 badge（CI/Python/License/Coverage/PyPI），结合 copier 模板特点完善内容
-- [ ] 完善 template/README.md：badge 区补充 PyPI 版本等 badge，内容完善
-- [ ] 同步完善 docs/index.rst 与项目根 README 文件清单
-- [ ] 验证：ruff/pyrefly/pytest 全绿，copier 渲染无冲突
+- [x] 完善项目根 README.md：补充 badge（CI/Python/License/Coverage/PyPI），结合 copier 模板特点完善内容
+- [x] 完善 template/README.md：badge 区补充 PyPI 版本等 badge，内容完善
+- [x] 同步完善 docs/index.rst 与项目根 README 文件清单
+- [x] 验证：ruff/pyrefly/pytest 全绿，copier 渲染无冲突
