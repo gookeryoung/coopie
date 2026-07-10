@@ -1,0 +1,23 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+.coverage
+.idea
+*_profile.html
+
+# Sphinx 文档构建输出
+docs/_build/
+.trae/refs
+
+# uv lock（首次 sync 自动生成）
+# uv.lock
+
+# Copier 答案文件（保留，用于 copier update）
+# .copier-answers.yml

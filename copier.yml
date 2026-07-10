@@ -1,0 +1,190 @@
+# Copier 模板配置
+# 文档: https://copier.readthedocs.io/
+#
+# 基于 pyflowx 项目实践，生成通用 Python 项目骨架。
+# 用法: copier copy f:\Dev\pytemplate <目标目录>
+
+_message_before_copy: |
+  === Python 项目模板 ===
+  基于 pyflowx 项目实践，包含:
+  - pyproject.toml (hatchling + uv + ruff + pyrefly + pytest + coverage)
+  - tox 多版本测试配置
+  - pre-commit 钩子
+  - GitHub Actions CI/CD
+  - Sphinx 文档 (ReadTheDocs)
+  - Dockerfile
+  - .trae 开发规则
+  - src layout 项目结构
+
+_message_after_copy: |
+  项目 {{ project_name }} 已创建！
+
+  下一步:
+    cd {{ project_name }}
+    uv sync --extra dev
+    uv run pytest
+    git init && git add -A && git commit -m "feat: 初始化项目"
+
+# ============================================================
+# 项目基本信息
+# ============================================================
+project_name:
+  type: str
+  help: 项目名称（可含连字符，用于 README/文档标题）
+  default: my-project
+
+package_name:
+  type: str
+  help: Python 包名（导入标识符，小写+下划线）
+  default: "{{ project_name|lower|replace('-', '_')|replace(' ', '_') }}"
+
+description:
+  type: str
+  help: 项目简短描述（一句话）
+  default: "A Python project."
+
+author_name:
+  type: str
+  help: 作者名称
+  default: ""
+
+author_email:
+  type: str
+  help: 作者邮箱
+  default: ""
+
+# ============================================================
+# Python 版本配置
+# ============================================================
+min_python_version:
+  type: str
+  help: 最低支持的 Python 版本
+  default: "3.8"
+  choices:
+    "3.8": "3.8"
+    "3.9": "3.9"
+    "3.10": "3.10"
+    "3.11": "3.11"
+    "3.12": "3.12"
+    "3.13": "3.13"
+    "3.14": "3.14"
+
+max_python_version:
+  type: str
+  help: 最高支持的 Python 版本
+  default: "3.14"
+  choices:
+    "3.8": "3.8"
+    "3.9": "3.9"
+    "3.10": "3.10"
+    "3.11": "3.11"
+    "3.12": "3.12"
+    "3.13": "3.13"
+    "3.14": "3.14"
+
+# ============================================================
+# 计算变量（when: false 表示不询问，自动派生）
+# ============================================================
+target_py:
+  type: str
+  default: "py{{ min_python_version|replace('.', '') }}"
+  when: false
+
+# 支持的 Python 版本列表（JSON 数组）
+supported_py_versions:
+  type: json
+  default: >-
+    {%- set all_versions = ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "3.14"] -%}
+    {%- set start = all_versions.index(min_python_version) -%}
+    {%- set end = all_versions.index(max_python_version) + 1 -%}
+    {{- all_versions[start:end] | tojson -}}
+  when: false
+
+# tox envlist 字符串（如 "py38, py39, py310"）
+tox_envlist:
+  type: str
+  default: >-
+    {%- set all_versions = ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "3.14"] -%}
+    {%- set start = all_versions.index(min_python_version) -%}
+    {%- set end = all_versions.index(max_python_version) + 1 -%}
+    {%- set versions = all_versions[start:end] -%}
+    {%- for v in versions -%}py{{ v|replace('.', '') }}{% if not loop.last %}, {% endif %}{%- endfor -%}
+  when: false
+
+# CI 矩阵中测试的 Python 版本（首尾两个）
+ci_test_versions:
+  type: json
+  default: >-
+    {%- set all_versions = ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "3.14"] -%}
+    {%- set start = all_versions.index(min_python_version) -%}
+    {%- set end = all_versions.index(max_python_version) + 1 -%}
+    {%- set versions = all_versions[start:end] -%}
+    {{- [versions[0], versions[-1]] | tojson -}}
+  when: false
+
+# ============================================================
+# 许可证
+# ============================================================
+license:
+  type: str
+  help: 许可证类型
+  default: "MIT"
+  choices:
+    "MIT": "MIT"
+    "Apache-2.0": "Apache-2.0"
+    "GPL-3.0": "GPL-3.0"
+    "None": "None"
+
+# ============================================================
+# 功能开关
+# ============================================================
+use_docs:
+  type: bool
+  help: 是否包含 Sphinx 文档配置（ReadTheDocs）
+  default: true
+
+use_docker:
+  type: bool
+  help: 是否包含 Dockerfile（CI/容器化用）
+  default: true
+
+use_cicd:
+  type: bool
+  help: 是否包含 GitHub Actions CI/CD 配置
+  default: true
+
+use_tox:
+  type: bool
+  help: 是否包含 tox 多版本测试配置
+  default: true
+
+use_domestic_mirrors:
+  type: bool
+  help: 是否预置国内镜像源（pip/uv 清华源、apt 阿里云）
+  default: true
+
+coverage_fail_under:
+  type: int
+  help: 覆盖率阈值（百分比）
+  default: 95
+
+# ============================================================
+# CI/CD 配置
+# ============================================================
+pypi_token_secret:
+  type: str
+  help: PyPI 发布 token 的 GitHub Secret 名称
+  default: "PYPI_TOKEN"
+
+# ============================================================
+# 模板配置
+# ============================================================
+_subdirectory: template
+_answers_file: .copier-answers.yml
+# copier v9 默认只渲染 .jinja 后缀文件；设为空字符串渲染所有文件
+_templates_suffix: ""
+# 不渲染的文件（二进制/空标记文件）
+_copy_without_render:
+  - "src/*/py.typed"
+  - "docs/_static/.gitkeep"
+  - "tests/__init__.py"
