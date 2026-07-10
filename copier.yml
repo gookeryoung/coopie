@@ -150,7 +150,7 @@ use_docs:
 use_docker:
   type: bool
   help: 是否包含 Dockerfile（CI/容器化用）
-  default: true
+  default: false
 
 use_cicd:
   type: bool
