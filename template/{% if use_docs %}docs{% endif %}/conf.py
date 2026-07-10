@@ -14,7 +14,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 # -- 项目信息 --------------------------------------------------------------
 project = "{{ project_name }}"
 author = "{{ author_name }}"
-copyright = "2024, {{ author_name }}"
+copyright = "{% now 'utc', '%Y' %}, {{ author_name }}"
 
 try:
     from {{ package_name }} import __version__  # type: ignore[import-not-found]

@@ -19,8 +19,7 @@ _message_before_copy: |
 _message_after_copy: |
   项目 {{ project_name }} 已创建！
 
-  下一步:
-    cd {{ project_name }}
+  下一步（在目标目录中执行）:
     uv sync --extra dev
     uv run pytest
     git init && git add -A && git commit -m "feat: 初始化项目"
@@ -183,6 +182,10 @@ _subdirectory: template
 _answers_file: .copier-answers.yml
 # copier v9 默认只渲染 .jinja 后缀文件；设为空字符串渲染所有文件
 _templates_suffix: ""
+# Jinja2 扩展（用于 {% now %} 取当前年份）
+# 需随 copier 一起安装: uvx --with jinja2-time copier ... 或 pip install copier jinja2-time
+_jinja_extensions:
+  - jinja2_time.TimeExtension
 # 不渲染的文件（二进制/空标记文件）
 _copy_without_render:
   - "src/*/py.typed"

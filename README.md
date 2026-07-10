@@ -21,18 +21,21 @@
 
 ### 创建新项目
 
+模板使用 `jinja2-time` 扩展获取当前年份，需随 copier 一起安装。
+
 ```bash
-# 安装 copier
-pip install copier
-# 或
-uv tool install copier
+# 方式一：uvx（推荐，无需预装）
+uvx --with jinja2-time copier copy --trust f:\Dev\pytemplate my-new-project
 
-# 从本地模板创建
-copier copy f:\Dev\pytemplate my-new-project
+# 方式二：pip
+pip install copier jinja2-time
+copier copy --trust f:\Dev\pytemplate my-new-project
 
-# 或从 git 仓库创建（推送到远程后）
-copier copy https://github.com/yourname/pytemplate.git my-new-project
+# 从 git 仓库创建（推送到远程后）
+uvx --with jinja2-time copier copy --trust https://github.com/yourname/pytemplate.git my-new-project
 ```
+
+> `--trust` 是必需的，因为模板使用了 `jinja_extensions` 功能（用于 `{% now %}` 动态获取版权年份）。
 
 ### 更新已有项目
 
@@ -40,7 +43,7 @@ copier copy https://github.com/yourname/pytemplate.git my-new-project
 
 ```bash
 cd my-new-project
-copier update
+uvx --with jinja2-time copier update --trust
 ```
 
 Copier 会读取 `.copier-answers.yml` 中的上一次答案，对比模板差异，增量合并更新。

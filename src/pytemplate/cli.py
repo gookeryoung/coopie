@@ -19,8 +19,11 @@ def main():
 
     cmd = [
         "uvx",
+        "--with",
+        "jinja2-time",
         "copier",
         "copy",
+        "--trust",
         "https://github.com/gookeryoung/pytemplate",
         str(dest_dir),
     ]
