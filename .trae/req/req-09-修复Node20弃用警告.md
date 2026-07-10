@@ -9,7 +9,7 @@ GitHub Actions 运行时报告 `astral-sh/setup-uv@v6` 使用已弃用的 Node.j
 ## 需求清单
 
 - [x] 需求确认：用户报告 Build & Publish 报弃用警告，需求清晰
-- [ ] 升级项目根 .github/workflows/ci.yml 和 release.yml 的 setup-uv@v6 → @v8
-- [ ] 升级模板 .github/workflows/ci.yml 和 release.yml 的 setup-uv@v6 → @v8
-- [ ] 检查其他 actions（checkout/setup-python）版本是否需升级
-- [ ] 提交、bump、迁移 _commit，创建 iter-09 文档
+- [x] 升级项目根 .github/workflows/ci.yml 和 release.yml 的 setup-uv@v6 → @v8
+- [x] 升级模板 .github/workflows/ci.yml 和 release.yml 的 setup-uv@v6 → @v8
+- [x] 检查其他 actions（checkout/setup-python）版本是否需升级（未被报告，不升级）
+- [x] 提交、bump、迁移 _commit，创建 iter-09 文档
