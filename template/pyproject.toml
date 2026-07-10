@@ -6,13 +6,13 @@ classifiers = [
 {% endfor %}    "Topic :: Software Development :: Libraries :: Python Modules",
 ]
 
-{% if license != "None" %}license = "{{ license }}"
-{% endif %}name = "{{ package_name }}"
 dependencies    = ["typing-extensions>=4.13.2; python_version < '3.13'"]
 description     = "{{ description }}"
+{% if license != "None" %}license         = "{{ license }}"
+{% endif %}name            = "{{ package_name }}"
 readme          = "README.md"
 requires-python = ">={{ min_python_version }}"
-version         = "0.1.0"
+version         = "{{ initial_version }}"
 
 [project.optional-dependencies]
 dev = [
@@ -121,7 +121,7 @@ python-version   = "{{ min_python_version }}"
 search-path      = ["."]
 
 [tool.bumpversion]
-current_version = "0.1.0"
+current_version = "{{ initial_version }}"
 commit = true
 exclude = ["template/*"]
 message = "chore: bump version {current_version} → {new_version}"

@@ -5,6 +5,7 @@ author_email: gooker_young@qq.com
 author_name: gooker_young
 coverage_fail_under: 95
 description: 基于 [copier](https://copier.readthedocs.io/) 的通用 Python 项目模板。
+initial_version: '0.1.8'
 license: MIT
 max_python_version: '3.14'
 min_python_version: '3.8'
