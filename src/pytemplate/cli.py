@@ -9,23 +9,19 @@ def main():
         description="Create a new Python project from a template."
     )
     parser.add_argument("project_name", type=str, help="Name of the new project.")
-    parser.add_argument(
-        "dest", type=str, default=".", help="Destination directory for the new project."
-    )
     args = parser.parse_args()
 
     if not args.project_name:
         parser.error("project_name is required")
 
-    if not args.dest:
-        parser.error("dest is required")
+    dest_dir = Path.cwd() / args.project_name.replace("-", "_")
+    dest_dir.mkdir(parents=True, exist_ok=True)
 
     cmd = [
         "uvx",
         "copier",
         "copy",
         "https://github.com/gookeryoung/pytemplate",
-        args.project_name,
-        Path(args.dest),
+        str(dest_dir),
     ]
     subprocess.run(cmd)
