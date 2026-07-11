@@ -13,6 +13,7 @@ classifiers = [
 ]
 
 dependencies    = []
+
 description     = "基于 [copier](https://copier.readthedocs.io/) 的通用 Python 项目模板。"
 license         = "MIT"
 name            = "coopie"
