@@ -199,3 +199,6 @@ _copy_without_render:
   - "src/*/py.typed"
   - "docs/_static/.gitkeep"
   - "tests/__init__.py"
+# 已存在时跳过更新（保护用户定制的项目元数据，工具配置已拆到独立文件可正常更新）
+_skip_if_exists:
+  - pyproject.toml
