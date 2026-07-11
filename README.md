@@ -95,7 +95,7 @@ coopie test -A -T     # 跳过所有问题和任务
 | `use_cicd` | bool | `true` | GitHub Actions CI/CD |
 | `use_tox` | bool | `true` | tox 多版本测试 |
 | `use_cli` | bool | `false` | CLI 入口配置（[project.scripts]，project_type=cli 时自动启用） |
-| `project_type` | str | `library` | 项目类型（library/cli/gui/web，决定入口模板与依赖） |
+| `project_type` | str | `library` | 项目类型（library/cli/gui/web；gui 按 Python 版本区分 PySide2≤3.10 / PySide6≥3.11） |
 | `use_domestic_mirrors` | bool | `true` | 国内镜像源 |
 | `coverage_fail_under` | int | `95` | 覆盖率阈值 |
 

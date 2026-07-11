@@ -169,12 +169,12 @@ use_cli:
 
 project_type:
   type: str
-  help: 项目类型（决定入口模板与依赖；gui 用 PySide2，web 用 FastAPI）
+  help: 项目类型（决定入口模板与依赖；gui 按 Python 版本用 PySide2≤3.10 / PySide6≥3.11，web 用 FastAPI）
   default: "library"
   choices:
     "library 纯库": "library"
     "cli 命令行工具": "cli"
-    "gui 桌面应用 (PySide2)": "gui"
+    "gui 桌面应用 (PySide2/PySide6)": "gui"
     "web 服务 (FastAPI)": "web"
 
 use_domestic_mirrors:

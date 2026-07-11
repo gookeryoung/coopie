@@ -6,7 +6,7 @@ classifiers = [
 {% endfor %}    "Topic :: Software Development :: Libraries :: Python Modules",
 ]
 
-{% if project_type == "gui" %}dependencies    = ["PySide2>=5.15.2.1; python_version <= '3.10'"]
+{% if project_type == "gui" %}dependencies    = ["PySide2>=5.15.2.1; python_version <= '3.10'", "PySide6>=6.5.0; python_version >= '3.11'"]
 {% elif project_type == "web" %}dependencies    = ["fastapi>=0.100.0", "uvicorn[standard]>=0.20.0"]
 {% else %}dependencies    = []
 {% endif %}
