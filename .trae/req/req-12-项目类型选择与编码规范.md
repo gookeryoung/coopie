@@ -8,23 +8,23 @@
 
 ## 需求
 
-- [ ] 新增 copier 变量 `project_type`（library/cli/gui/web），默认 library
-- [ ] 根据 project_type 配置对应依赖：
+- [x] 新增 copier 变量 `project_type`（library/cli/gui/web），默认 library
+- [x] 根据 project_type 配置对应依赖：
   - library/cli: 无额外依赖
   - gui: PySide2（环境标记 `python_version <= "3.10"`，因 PyPI wheel 仅支持 3.6-3.10）
   - web: fastapi + uvicorn[standard]
-- [ ] 根据 project_type 生成入口模板文件：
+- [x] 根据 project_type 生成入口模板文件：
   - cli: src/{package_name}/cli.py（与 use_cli 对齐）
   - gui: src/{package_name}/main.py（PySide2 QApplication 入口）
   - web: src/{package_name}/app.py（FastAPI app 实例）
-- [ ] CLI（coopie new/init）增加 `--type` 选项传递 project_type
-- [ ] 填充 `.trae/rules/rule-12-pyqt-standards.md`（PySide2 编码规范，最佳实践）
-- [ ] 模板内 rule-12 条件渲染（project_type=gui 时生成到生成项目）
-- [ ] `.copier-answers.yml` 添加 `project_type: cli`（coopie 自身是 CLI 工具）
-- [ ] README 同步更新 project_type 说明（项目根 + 模板）
-- [ ] 测试覆盖（CLI --type 选项，覆盖率 ≥ 95%）
-- [ ] 验证：ruff + pyrefly + pytest 95% + copier update 无冲突
-- [ ] bump 版本（feat → minor 0.2.4 → 0.3.0）+ 迁移 _commit
+- [x] CLI（coopie new/init）增加 `--type` 选项传递 project_type
+- [x] 填充 `.trae/rules/rule-12-pyqt-standards.md`（PySide2 编码规范，最佳实践）
+- [x] 模板内 rule-12 条件渲染（project_type=gui 时生成到生成项目）
+- [x] `.copier-answers.yml` 添加 `project_type: library`（coopie 自身 use_cli=true，避免 cli.py 模板冲突）
+- [x] README 同步更新 project_type 说明（项目根 + 模板）
+- [x] 测试覆盖（CLI --type 选项，覆盖率 100%）
+- [x] 验证：ruff + pyrefly + pytest 100% + copier update 无冲突
+- [x] bump 版本（feat → minor 0.2.4 → 0.3.0）+ 迁移 _commit v0.2.3 → v0.3.0
 
 ## 约束
 
