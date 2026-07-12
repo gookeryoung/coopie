@@ -9,7 +9,7 @@ from pathlib import Path
 
 from coopie import __version__
 
-_DEFAULT_TEMPLATE_REPO = "https://github.com/gookeryoung/coopie"
+_DEFAULT_TEMPLATE_REPO = "https://gitee.com/gooker_young/coopie.git"
 _TEMPLATE_ENV_VAR = "COOPIE_TEMPLATE_REPO"
 _COPIER_TIMEOUT = 600  # 秒，copier copy/update 超时阈值
 
