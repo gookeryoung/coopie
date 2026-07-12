@@ -1,18 +1,14 @@
 # Copier 模板配置
 # 文档: https://copier.readthedocs.io/
-#
-# 基于 pyflowx 项目实践，生成通用 Python 项目骨架。
-# 用法: copier copy f:\Dev\coopie <目标目录>
 
 _message_before_copy: |
   === Python 项目模板 ===
-  基于 pyflowx 项目实践，包含:
+  基于 copier 的通用 Python 项目模板，一键生成开箱即用的工程骨架。包含:
   - pyproject.toml (hatchling + uv + ruff + pyrefly + pytest + coverage)
   - tox 多版本测试配置
   - pre-commit 钩子
   - GitHub Actions CI/CD
   - Sphinx 文档 (ReadTheDocs)
-  - Dockerfile
   - .trae 开发规则
   - src layout 项目结构
 
