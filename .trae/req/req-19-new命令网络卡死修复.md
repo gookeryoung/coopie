@@ -18,4 +18,4 @@
 - [x] 同步更新 README 和 docs/index.rst
 - [x] ruff/pyrefly/pytest 全绿
 - [x] 实际验证 `coopie new --template <local>` 不卡
-- [ ] bump 版本、迁移 `_commit`、copier update 无冲突
+- [x] bump 版本、迁移 `_commit`、copier update 无冲突
