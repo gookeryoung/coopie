@@ -40,7 +40,7 @@ doc: ## 构建 Sphinx 文档
 	uv run sphinx-build -b html docs docs/_build/html
 
 tox: ## 多版本测试 (tox)
-	uvx tox run
+	uvx tox -p auto
 
 BUMP_PART := $(filter-out bump,$(MAKECMDGOALS))
 

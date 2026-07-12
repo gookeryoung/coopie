@@ -41,7 +41,7 @@ doc: ## 构建 Sphinx 文档
 {% endif %}
 {% if use_tox %}
 tox: ## 多版本测试 (tox)
-	uvx tox run
+	uvx tox -p auto
 {% endif %}
 BUMP_PART := $(filter-out bump,$(MAKECMDGOALS))
 
