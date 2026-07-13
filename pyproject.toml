@@ -19,7 +19,7 @@ license         = "MIT"
 name            = "coopie"
 readme          = "README.md"
 requires-python = ">=3.8"
-version         = "0.6.0"
+version         = "0.7.0"
 
 [project.optional-dependencies]
 dev = [
@@ -126,7 +126,7 @@ python-version   = "3.8"
 search-path      = ["."]
 
 [tool.bumpversion]
-current_version = "0.6.0"
+current_version = "0.7.0"
 commit = true
 exclude = ["template/*"]
 message = "chore: 更新版本 {current_version} → {new_version}"
