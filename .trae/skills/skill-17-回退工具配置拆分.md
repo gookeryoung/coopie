@@ -1,4 +1,4 @@
-# iter-17：回退工具配置拆分
+# skill-17：回退工具配置拆分（归档自 iter-17/req-17）
 
 ## 迭代目标
 
@@ -6,7 +6,7 @@
 
 ## 需求确认
 
-用户反馈 iter-16 方向错误：工具配置相对标准不需要拆分，`[project.optional-dependencies]` 这类用户频繁定制的项目相关内容才需要解析合并措施。用户选择方案 D（回退拆分 + 接受原始状态）。详见 `.trae/req/req-17-回退工具配置拆分.md`。
+用户反馈 iter-16 方向错误：工具配置相对标准不需要拆分，`[project.optional-dependencies]` 这类用户频繁定制的项目相关内容才需要解析合并措施。用户选择方案 D（回退拆分 + 接受原始状态）。
 
 ## 改动文件清单
 
@@ -23,8 +23,6 @@
 | `pyrefly.toml` | 删除 | iter-16 创建的独立配置 |
 | `.coveragerc` | 删除 | iter-16 创建的独立配置 |
 | `pytest.ini` | 删除 | iter-16 创建的独立配置 |
-| `.trae/skills/skill-13-PySide6支持与版本区分.md` | 新建 | 归档自 iter-13/req-13（阈值触发） |
-| `.trae/docs/iter-13-*` / `.trae/req/req-13-*` | 删除 | 已归档至 skill-13 |
 
 ## 关键决策与依据
 
@@ -45,3 +43,26 @@
 ## 遗留事项
 
 - `[project.optional-dependencies]` 的 TOML 语义合并问题仍未解决，用户在 copier update 时可能遇到依赖列表行级冲突。当前接受 copier 行级 diff3 行为，冲突时手动解决。
+
+## 需求清单（归档自 req-17）
+
+- [x] 恢复 template/pyproject.toml 工具配置段（Jinja 变量版）
+- [x] 恢复 pyproject.toml 工具配置段（渲染值版）
+- [x] 移除 copier.yml 中的 `_skip_if_exists` 段
+- [x] 删除 8 个独立配置文件（template/ 和项目根各 4 个）
+- [x] make check 验证回退后状态正常
+- [x] bump 版本 0.4.4 → 0.4.5 + push
+- [x] 更新 memory 文件（移除 _skip_if_exists 约定）
+
+## 约束
+
+- 回退到 iter-16 前（commit 1693e92）的准确状态，不引入新变更
+- `[project.optional-dependencies]` 的 TOML 语义合并问题暂不解决（接受 copier 行级 diff3 原始状态）
+- 标准门禁：ruff + pyrefly + pytest 95% 覆盖率
+
+## 验收标准
+
+- pyproject.toml（项目根 + 模板）包含完整的工具配置段
+- copier.yml 无 `_skip_if_exists` 段
+- 8 个独立配置文件已删除
+- make check 全绿

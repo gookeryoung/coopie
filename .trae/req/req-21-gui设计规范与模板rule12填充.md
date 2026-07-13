@@ -17,21 +17,21 @@
 
 ## 需求清单
 
-- [ ] 1. 接收并分析用户导出的 Figma 图片，提取设计要素（布局结构、导航模式、间距/尺度、组件层级）
-- [ ] 2. 起草 `template/.trae/rules/rule-12-gui-pyside-standards.md` 内容，结构包含：
-  - [ ] 2.1 概述与适用范围
-  - [ ] 2.2 工具链（PySide2/PySide6 兼容）
-  - [ ] 2.3 布局规范（主窗口结构、栅格、间距尺度）
-  - [ ] 2.4 导航模式（侧边栏/Tab/面包屑等）
-  - [ ] 2.5 组件层级与样式（QSS、主题）
-  - [ ] 2.6 信号槽与状态管理
-  - [ ] 2.7 线程与长任务
-  - [ ] 2.8 测试（pytest-qt）
-  - [ ] 2.9 打包（PyInstaller）
-- [ ] 3. 同步保留项目根 `.trae/rules/rule-12-pyqt-standards.md`（项目自身使用，不强制同步）
-- [ ] 4. 验证：模板渲染检查（`copier copy` 非 git 副本，确认 rule-12 文件正确生成）
-- [ ] 5. 版本 bump + _commit 迁移 + copier update 验证
-- [ ] 6. 创建 iter-21 文档，归档检查
+- [x] 1. 接收并分析用户导出的 Figma 图片，提取设计要素（布局结构、导航模式、间距/尺度、组件层级）
+- [x] 2. 起草 `template/.trae/rules/rule-12-gui-pyside-standards.md` 内容，结构包含：
+  - [x] 2.1 概述与适用范围
+  - [x] 2.2 工具链（PySide2/PySide6 兼容）
+  - [x] 2.3 布局规范（主窗口结构、栅格、间距尺度）
+  - [x] 2.4 导航模式（侧边栏/Tab/面包屑等）
+  - [x] 2.5 组件层级与样式（QSS、主题）
+  - [x] 2.6 信号槽与状态管理
+  - [x] 2.7 线程与长任务
+  - [x] 2.8 测试（pytest-qt）
+  - [x] 2.9 打包（PyInstaller）
+- [x] 3. 同步保留项目根 `.trae/rules/rule-12-pyqt-standards.md`（项目自身使用，不强制同步）
+- [x] 4. 验证：模板渲染检查（`copier copy` 非 git 副本，确认 rule-12 文件正确生成）
+- [x] 5. 版本 bump + _commit 迁移 + copier update 验证
+- [x] 6. 创建 iter-21 文档，归档检查
 
 ## 约束
 
