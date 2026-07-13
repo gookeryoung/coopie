@@ -53,5 +53,5 @@ patch minor major:
 pub:  ## 推送到pypi
 	uvx twine upload ./dist/**
 
-push: ## 推送代码到远程仓库
-	git push && git push --tags
+push: ## 推送代码到所有远程仓库
+	@set -e; for remote in $$(git remote); do echo "推送 $$remote..."; git push $$remote; git push $$remote --tags; done

@@ -30,7 +30,7 @@ def _get_git_config(key: str) -> str | None:
 
 
 def _resolve_template_repo(cli_value: str | None) -> str:
-    """解析模板源：--template 优先，其次环境变量，最后默认 GitHub 仓库."""
+    """解析模板源：--template 优先，其次环境变量，最后默认 Gitee 仓库."""
     if cli_value:
         return cli_value
     env_value = os.environ.get(_TEMPLATE_ENV_VAR)

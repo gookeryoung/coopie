@@ -210,7 +210,7 @@ def test_main_new_without_git_config(monkeypatch: pytest.MonkeyPatch, tmp_path: 
     assert "copier" in cmd
     assert "copy" in cmd
     assert "project_name=my-project" in cmd
-    assert "https://github.com/gookeryoung/coopie" in cmd
+    assert "https://gitee.com/gooker_young/coopie.git" in cmd
     assert (tmp_path / "my_project").is_dir()
     assert not any("author_" in c for c in cmd)
 
@@ -578,9 +578,9 @@ def test_resolve_template_repo_env_var(monkeypatch: pytest.MonkeyPatch) -> None:
 
 
 def test_resolve_template_repo_default(monkeypatch: pytest.MonkeyPatch) -> None:
-    """无 --template 且无环境变量时用默认 GitHub 仓库."""
+    """无 --template 且无环境变量时用默认 Gitee 仓库."""
     monkeypatch.delenv("COOPIE_TEMPLATE_REPO", raising=False)
-    assert cli._resolve_template_repo(None) == "https://github.com/gookeryoung/coopie"
+    assert cli._resolve_template_repo(None) == "https://gitee.com/gooker_young/coopie.git"
 
 
 def test_resolve_template_repo_cli_overrides_env(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -592,7 +592,7 @@ def test_resolve_template_repo_cli_overrides_env(monkeypatch: pytest.MonkeyPatch
 def test_resolve_template_repo_empty_env_ignored(monkeypatch: pytest.MonkeyPatch) -> None:
     """环境变量为空字符串时退回默认."""
     monkeypatch.setenv("COOPIE_TEMPLATE_REPO", "")
-    assert cli._resolve_template_repo(None) == "https://github.com/gookeryoung/coopie"
+    assert cli._resolve_template_repo(None) == "https://gitee.com/gooker_young/coopie.git"
 
 
 # --- _build_parser: --template ---
@@ -706,7 +706,7 @@ def test_main_new_template_env_var(monkeypatch: pytest.MonkeyPatch, tmp_path: Pa
     monkeypatch.setattr(subprocess, "run", fake_run)
     cli.main()
     assert "https://mirror.example/repo" in captured["cmd"]
-    assert not any("github.com/gookeryoung/coopie" in c for c in captured["cmd"])
+    assert not any("gitee.com/gooker_young/coopie" in c for c in captured["cmd"])
 
 
 def test_main_new_template_default(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
@@ -723,7 +723,7 @@ def test_main_new_template_default(monkeypatch: pytest.MonkeyPatch, tmp_path: Pa
 
     monkeypatch.setattr(subprocess, "run", fake_run)
     cli.main()
-    assert "https://github.com/gookeryoung/coopie" in captured["cmd"]
+    assert "https://gitee.com/gooker_young/coopie.git" in captured["cmd"]
 
 
 def test_main_init_with_template(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
