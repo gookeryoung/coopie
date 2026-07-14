@@ -1,3 +1,8 @@
+---
+alwaysApply: true
+glob: "*.{py,pyi}"
+---
+
 # Python 开发规范
 
 ## 工具链（以 pyproject.toml 为准）
