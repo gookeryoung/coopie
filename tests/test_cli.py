@@ -463,8 +463,9 @@ def test_main_init_without_type_no_project_type(monkeypatch: pytest.MonkeyPatch,
 # --- main: update ---
 
 
-def test_main_update(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_main_update(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     """update 执行 copier update 命令."""
+    monkeypatch.chdir(tmp_path)
     monkeypatch.setattr(sys, "argv", ["coopie", "update"])
     captured: dict[str, list[str]] = {}
 
@@ -477,8 +478,9 @@ def test_main_update(monkeypatch: pytest.MonkeyPatch) -> None:
     assert captured["cmd"] == ["uvx", "copier", "update"]
 
 
-def test_main_update_skip_answered(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_main_update_skip_answered(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     """update -A 在命令中追加 --skip-answered."""
+    monkeypatch.chdir(tmp_path)
     monkeypatch.setattr(sys, "argv", ["coopie", "update", "-A"])
     captured: dict[str, list[str]] = {}
 
@@ -491,8 +493,9 @@ def test_main_update_skip_answered(monkeypatch: pytest.MonkeyPatch) -> None:
     assert captured["cmd"] == ["uvx", "copier", "update", "--skip-answered"]
 
 
-def test_main_update_skip_tasks(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_main_update_skip_tasks(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     """update -T 在命令中追加 --skip-tasks."""
+    monkeypatch.chdir(tmp_path)
     monkeypatch.setattr(sys, "argv", ["coopie", "update", "-T"])
     captured: dict[str, list[str]] = {}
 
@@ -505,8 +508,9 @@ def test_main_update_skip_tasks(monkeypatch: pytest.MonkeyPatch) -> None:
     assert captured["cmd"] == ["uvx", "copier", "update", "--skip-tasks"]
 
 
-def test_main_update_called_process_error(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_main_update_called_process_error(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     """copier update 失败时退出."""
+    monkeypatch.chdir(tmp_path)
     monkeypatch.setattr(sys, "argv", ["coopie", "update"])
 
     def fake_run(cmd: list[str], **kwargs: object) -> None:
@@ -520,8 +524,9 @@ def test_main_update_called_process_error(monkeypatch: pytest.MonkeyPatch) -> No
 # --- main: test ---
 
 
-def test_main_test(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_main_test(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     """test 命令执行 copier update --pretend."""
+    monkeypatch.chdir(tmp_path)
     monkeypatch.setattr(sys, "argv", ["coopie", "test"])
     captured: dict[str, list[str]] = {}
 
@@ -534,8 +539,9 @@ def test_main_test(monkeypatch: pytest.MonkeyPatch) -> None:
     assert captured["cmd"] == ["uvx", "copier", "update", "--pretend"]
 
 
-def test_main_test_skip_answered(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_main_test_skip_answered(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     """test -A 在命令中追加 --skip-answered."""
+    monkeypatch.chdir(tmp_path)
     monkeypatch.setattr(sys, "argv", ["coopie", "test", "-A"])
     captured: dict[str, list[str]] = {}
 
@@ -548,8 +554,9 @@ def test_main_test_skip_answered(monkeypatch: pytest.MonkeyPatch) -> None:
     assert captured["cmd"] == ["uvx", "copier", "update", "--pretend", "--skip-answered"]
 
 
-def test_main_test_skip_tasks(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_main_test_skip_tasks(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     """test -T 在命令中追加 --skip-tasks."""
+    monkeypatch.chdir(tmp_path)
     monkeypatch.setattr(sys, "argv", ["coopie", "test", "-T"])
     captured: dict[str, list[str]] = {}
 
@@ -743,3 +750,149 @@ def test_main_init_with_template(monkeypatch: pytest.MonkeyPatch, tmp_path: Path
     monkeypatch.setattr(subprocess, "run", fake_run)
     cli.main()
     assert "/local/template" in captured["cmd"]
+
+
+# --- _parse_version ---
+
+
+def test_parse_version_valid() -> None:
+    """标准 'vX.Y.Z' 格式正确解析为整数元组."""
+    assert cli._parse_version("v0.4.2") == (0, 4, 2)
+
+
+def test_parse_version_no_v_prefix() -> None:
+    """无 v 前缀的 'X.Y.Z' 同样可解析."""
+    assert cli._parse_version("0.7.10") == (0, 7, 10)
+
+
+def test_parse_version_with_spaces() -> None:
+    """前后空白被 strip 后正常解析."""
+    assert cli._parse_version("  v0.3.0  ") == (0, 3, 0)
+
+
+def test_parse_version_invalid() -> None:
+    """非语义化版本字符串返回 None."""
+    assert cli._parse_version("abc") is None
+    assert cli._parse_version("v1.2") is None
+    assert cli._parse_version("v1.2.3.4") is None
+    assert cli._parse_version("") is None
+
+
+# --- _patch_broken_answers_commit ---
+
+
+def test_patch_broken_answers_commit_no_file(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """无 .copier-answers.yml 时返回 False."""
+    monkeypatch.chdir(tmp_path)
+    assert cli._patch_broken_answers_commit() is False
+
+
+def test_patch_broken_answers_commit_broken_version(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """_commit 在破损范围（v0.3.0 ~ v0.7.1）时自动升级到 v0.7.2."""
+    monkeypatch.chdir(tmp_path)
+    answers = tmp_path / ".copier-answers.yml"
+    answers.write_text("_commit: v0.4.2\n_src_path: https://example.com/repo.git\n", encoding="utf-8")
+    assert cli._patch_broken_answers_commit() is True
+    content = answers.read_text(encoding="utf-8")
+    assert "_commit: v0.7.2" in content
+    assert "_src_path: https://example.com/repo.git" in content
+    err = capsys.readouterr().err
+    assert "v0.4.2" in err
+    assert "v0.7.2" in err
+
+
+def test_patch_broken_answers_commit_boundary_min(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """边界 v0.3.0 属于破损范围，被升级."""
+    monkeypatch.chdir(tmp_path)
+    answers = tmp_path / ".copier-answers.yml"
+    answers.write_text("_commit: v0.3.0\n", encoding="utf-8")
+    assert cli._patch_broken_answers_commit() is True
+    assert "_commit: v0.7.2" in answers.read_text(encoding="utf-8")
+
+
+def test_patch_broken_answers_commit_boundary_max(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """边界 v0.7.1 属于破损范围，被升级."""
+    monkeypatch.chdir(tmp_path)
+    answers = tmp_path / ".copier-answers.yml"
+    answers.write_text("_commit: v0.7.1\n", encoding="utf-8")
+    assert cli._patch_broken_answers_commit() is True
+    assert "_commit: v0.7.2" in answers.read_text(encoding="utf-8")
+
+
+def test_patch_broken_answers_commit_clean_before(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """v0.2.4 早于破损范围，不修改."""
+    monkeypatch.chdir(tmp_path)
+    answers = tmp_path / ".copier-answers.yml"
+    answers.write_text("_commit: v0.2.4\n", encoding="utf-8")
+    assert cli._patch_broken_answers_commit() is False
+    assert "_commit: v0.2.4" in answers.read_text(encoding="utf-8")
+
+
+def test_patch_broken_answers_commit_clean_after(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """v0.7.2 晚于破损范围，不修改."""
+    monkeypatch.chdir(tmp_path)
+    answers = tmp_path / ".copier-answers.yml"
+    answers.write_text("_commit: v0.7.2\n", encoding="utf-8")
+    assert cli._patch_broken_answers_commit() is False
+    assert "_commit: v0.7.2" in answers.read_text(encoding="utf-8")
+
+
+def test_patch_broken_answers_commit_no_commit_field(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """文件中无 _commit 字段时返回 False."""
+    monkeypatch.chdir(tmp_path)
+    answers = tmp_path / ".copier-answers.yml"
+    answers.write_text("_src_path: https://example.com/repo.git\n", encoding="utf-8")
+    assert cli._patch_broken_answers_commit() is False
+
+
+def test_patch_broken_answers_commit_unparseable(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """_commit 值无法解析为语义化版本时返回 False."""
+    monkeypatch.chdir(tmp_path)
+    answers = tmp_path / ".copier-answers.yml"
+    answers.write_text("_commit: HEAD\n", encoding="utf-8")
+    assert cli._patch_broken_answers_commit() is False
+
+
+# --- main: update with broken commit ---
+
+
+def test_main_update_patches_broken_commit(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """update 命令在执行 copier 前自动修补破损的 _commit."""
+    monkeypatch.chdir(tmp_path)
+    answers = tmp_path / ".copier-answers.yml"
+    answers.write_text("_commit: v0.4.2\n_src_path: https://example.com/repo.git\n", encoding="utf-8")
+    monkeypatch.setattr(sys, "argv", ["coopie", "update"])
+    captured: dict[str, list[str]] = {}
+
+    def fake_run(cmd: list[str], **kwargs: object) -> SimpleNamespace:
+        captured["cmd"] = cmd
+        return SimpleNamespace(returncode=0)
+
+    monkeypatch.setattr(subprocess, "run", fake_run)
+    cli.main()
+    assert captured["cmd"] == ["uvx", "copier", "update"]
+    assert "_commit: v0.7.2" in answers.read_text(encoding="utf-8")
+    err = capsys.readouterr().err
+    assert "v0.4.2" in err
+
+
+def test_main_test_patches_broken_commit(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    """test 命令同样在执行 copier 前自动修补破损的 _commit."""
+    monkeypatch.chdir(tmp_path)
+    answers = tmp_path / ".copier-answers.yml"
+    answers.write_text("_commit: v0.6.0\n", encoding="utf-8")
+    monkeypatch.setattr(sys, "argv", ["coopie", "test"])
+    captured: dict[str, list[str]] = {}
+
+    def fake_run(cmd: list[str], **kwargs: object) -> SimpleNamespace:
+        captured["cmd"] = cmd
+        return SimpleNamespace(returncode=0)
+
+    monkeypatch.setattr(subprocess, "run", fake_run)
+    cli.main()
+    assert captured["cmd"] == ["uvx", "copier", "update", "--pretend"]
+    assert "_commit: v0.7.2" in answers.read_text(encoding="utf-8")

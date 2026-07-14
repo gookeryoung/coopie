@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import os
+import re
 import subprocess
 import sys
 import typing
@@ -12,6 +13,13 @@ from coopie import __version__
 _DEFAULT_TEMPLATE_REPO = "https://gitee.com/gooker_young/coopie.git"
 _TEMPLATE_ENV_VAR = "COOPIE_TEMPLATE_REPO"
 _COPIER_TIMEOUT = 600  # 秒，copier copy/update 超时阈值
+
+# 历史标签 v0.3.0 ~ v0.7.1 的模板含文件名带双引号的 rule-12 文件，
+# Windows 文件系统不允许文件名含双引号，导致 copier update 无法检出这些标签。
+# v0.7.2 起该文件已移除，是可正常检出的最早版本。
+_BROKEN_COMMIT_MIN = (0, 3, 0)
+_BROKEN_COMMIT_MAX = (0, 7, 1)
+_FALLBACK_COMMIT = "v0.7.2"
 
 
 def _get_git_config(key: str) -> str | None:
@@ -37,6 +45,50 @@ def _resolve_template_repo(cli_value: str | None) -> str:
     if env_value:
         return env_value
     return _DEFAULT_TEMPLATE_REPO
+
+
+def _parse_version(version: str) -> tuple[int, int, int] | None:
+    """解析版本号字符串（如 'v0.4.2'）为整数元组（如 (0, 4, 2)），无法解析时返回 None."""
+    match = re.match(r"^v?(\d+)\.(\d+)\.(\d+)$", version.strip())
+    if not match:
+        return None
+    return int(match.group(1)), int(match.group(2)), int(match.group(3))
+
+
+def _patch_broken_answers_commit() -> bool:
+    """检查并修补 .copier-answers.yml 中指向不可检出标签的 _commit 字段.
+
+    历史标签 v0.3.0 ~ v0.7.1 含文件名带双引号的 rule-12 文件，Windows 无法检出。
+    若检测到 _commit 落在该范围，自动升级到 _FALLBACK_COMMIT（v0.7.2）。
+    返回 True 表示已修补，False 表示无需修补或文件不存在。
+    """
+    answers_file = Path.cwd() / ".copier-answers.yml"
+    if not answers_file.is_file():
+        return False
+    content = answers_file.read_text(encoding="utf-8")
+    match = re.search(r"^_commit:\s*(.+)$", content, re.MULTILINE)
+    if not match:
+        return False
+    commit_value = match.group(1).strip()
+    version = _parse_version(commit_value)
+    if version is None:
+        return False
+    if not (_BROKEN_COMMIT_MIN <= version <= _BROKEN_COMMIT_MAX):
+        return False
+    new_content = re.sub(
+        r"^_commit:\s*.+$",
+        f"_commit: {_FALLBACK_COMMIT}",
+        content,
+        count=1,
+        flags=re.MULTILINE,
+    )
+    answers_file.write_text(new_content, encoding="utf-8")
+    print(
+        f"检测到模板版本 {commit_value} 在 Windows 上无法检出（含非法文件名），"
+        f"已自动将 .copier-answers.yml 的 _commit 升级到 {_FALLBACK_COMMIT}。",
+        file=sys.stderr,
+    )
+    return True
 
 
 def _build_parser() -> argparse.ArgumentParser:
@@ -159,6 +211,7 @@ def _run_init(args: argparse.Namespace) -> None:
 
 def _run_update(args: argparse.Namespace) -> None:
     """更新当前目录中的已生成项目模板."""
+    _patch_broken_answers_commit()
     cmd: list[str] = ["uvx", "copier", "update"]
     if args.skip_answered:
         cmd.append("--skip-answered")
@@ -169,6 +222,7 @@ def _run_update(args: argparse.Namespace) -> None:
 
 def _run_test(args: argparse.Namespace) -> None:
     """模拟检查模板更新是否产生冲突."""
+    _patch_broken_answers_commit()
     cmd: list[str] = ["uvx", "copier", "update", "--pretend"]
     if args.skip_answered:
         cmd.append("--skip-answered")
