@@ -39,6 +39,7 @@ check: lint typecheck cov ## 运行全套门禁 (lint + typecheck + cov)
 doc: ## 构建 Sphinx 文档
 	uv run sphinx-build -b html docs docs/_build/html
 
+
 tox: ## 多版本测试 (tox)
 	uvx tox -p auto
 
@@ -55,3 +56,4 @@ pub:  ## 推送到pypi
 
 push: ## 推送代码到所有远程仓库
 	@uv run python -c "import subprocess as sp; [print(f'\u63a8\u9001 {r}...',flush=True) or (sp.run(['git','push',r],check=True) and sp.run(['git','push',r,'--tags'],check=True)) for r in sp.check_output(['git','remote'],text=True).split()]"
+
