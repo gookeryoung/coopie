@@ -14,6 +14,8 @@ Python 项目须遵守 `rule-11-python-standards.md` 硬约束；涉及以下领
 - 类设计（dataclass/ABC/Enum/缓存/继承组合/设计模式）→ `python-class-design` SKILL
 - 并发（threading/concurrent.futures/multiprocessing/asyncio/线程安全）→ `python-concurrency` SKILL
 - 文件 I/O（pathlib/读写/上下文管理/临时文件/序列化/原子写入）→ `python-file-io` SKILL
+- 测试（pytest fixtures/parametrize/mock/coverage/pytest-qt）→ `python-testing` SKILL
+- CLI 开发（Click/Typer/子命令/进度/配置/测试）→ `python-cli` SKILL
 
 ## 项目场景
 
