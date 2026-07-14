@@ -11,19 +11,19 @@ QMainWindow
 └─ central (QWidget, QVBoxLayout, margin=0, spacing=0)
    ├─ header_bar (QFrame#header_bar)            ← Header
    ├─ tab_stack (QStackedWidget)                ← 顶层 Tab 切换层
-   │  └─ scan_tab (QWidget, QVBoxLayout)
+   │  └─ <功能域页面> (QWidget, QVBoxLayout)
    │     └─ sidebar_splitter (QSplitter, Horizontal, handleWidth=4)
    │        ├─ sidebar (QListWidget#sidebar)    ← Sidebar
    │        └─ main_stack (QStackedWidget#main_stack)  ← Content
    │           ├─ setup_page
-   │           ├─ scanning_page
+   │           ├─ running_page
    │           └─ results_page
    └─ statusBar()                               ← Status（QMainWindow 自带）
 ```
 
 要点：
 
-- **双层 QStackedWidget**：`tab_stack` 切换顶层功能域（扫描/规则/历史），`main_stack` 切换功能域内的工作流阶段。两层职责分离，避免单层页面数过多。
+- **双层 QStackedWidget**：`tab_stack` 切换顶层功能域，`main_stack` 切换功能域内的工作流阶段。两层职责分离，避免单层页面数过多。
 - **QSplitter 而非固定布局**：侧边栏与内容区、列表与详情均用 `QSplitter`，允许用户拖拽调整比例，禁用 `setGeometry` 硬编码几何。
 - **零边距根布局**：`central_layout` 的 margin 与 spacing 均为 0，四区紧贴；区间分隔由各区自带边框/背景色承担。
 - **minimumSize 兜底**：主窗口 `setMinimumSize(800, 600)`，低于此值触发滚动条而非压缩控件。
@@ -67,15 +67,15 @@ QMainWindow
 
 ### 2.5 交互
 
-- 点击 Tab 按钮 → `QButtonGroup.idClicked` 信号 → `_on_header_tab_changed(tab_id)` → `tab_stack.setCurrentIndex(tab_id)`。
+- 点击 Tab 按钮 → `QButtonGroup.idClicked` 信号 → `_on_tab_changed(tab_id)` → `tab_stack.setCurrentIndex(tab_id)`。
 - 选中态由 `QButtonGroup` 自动维护，无需手动 `setChecked`。
-- 非扫描 Tab 隐藏侧边栏：`sidebar.setVisible(tab_id == 0)`。
+- 非主任务 Tab 隐藏侧边栏：`sidebar.setVisible(tab_id == 0)`。
 
 ## 三、Sidebar（侧边栏）
 
 ### 3.1 职责
 
-在当前功能域内切换工作流阶段（如扫描 Tab 下的 配置→扫描中→结果）。仅承载阶段导航项，不承载业务操作按钮。
+在当前功能域内切换工作流阶段（如主任务 Tab 下的 配置→执行中→结果）。仅承载阶段导航项，不承载业务操作按钮。
 
 ### 3.2 结构与尺寸
 
@@ -95,7 +95,7 @@ QMainWindow
 侧边栏为主色深色背景，图标须用白色变体：
 
 ```python
-icon_on_primary = _load_themed_icon(_ICON_FOLDER, theme.COLOR_TEXT_ON_PRIMARY)
+icon_on_primary = load_themed_icon(icon_path, theme.COLOR_TEXT_ON_PRIMARY)
 item = QListWidgetItem(icon_on_primary, "配置")
 ```
 
@@ -111,7 +111,7 @@ item = QListWidgetItem(icon_on_primary, "配置")
 
 ### 3.5 交互
 
-- `currentRowChanged` → `_on_sidebar_stage_changed(row)` → 映射 row 到 `WorkflowStage` → `_switch_stage(stage)`。
+- `currentRowChanged` → `_on_sidebar_changed(row)` → 映射 row 到阶段枚举 → `_switch_stage(stage)`。
 - `_switch_stage` 同步反向更新侧边栏选中项时，须 `blockSignals(True)` 包裹避免循环触发：
 
 ```python
@@ -122,10 +122,10 @@ self.sidebar.blockSignals(False)
 
 ### 3.6 可见性联动
 
-侧边栏仅在与工作流强相关的 Tab 显示；纯管理类 Tab（规则管理、扫描历史）整页切换，隐藏侧边栏：
+侧边栏仅在与工作流强相关的 Tab 显示；纯管理类 Tab 整页切换，隐藏侧边栏：
 
 ```python
-def _on_header_tab_changed(self, tab_id: int) -> None:
+def _on_tab_changed(self, tab_id: int) -> None:
     self.tab_stack.setCurrentIndex(tab_id)
     self.sidebar.setVisible(tab_id == 0)
 ```
@@ -140,35 +140,35 @@ def _on_header_tab_changed(self, tab_id: int) -> None:
 
 | 层级 | 容器 | 切换粒度 | 触发 |
 |------|------|----------|------|
-| 顶层 | `tab_stack` | 功能域（扫描/规则/历史） | Header Tab 按钮 |
-| 内层 | `main_stack` | 工作流阶段（配置/扫描中/结果） | Sidebar 选中项 / 业务流程 |
+| 顶层 | `tab_stack` | 功能域 | Header Tab 按钮 |
+| 内层 | `main_stack` | 工作流阶段 | Sidebar 选中项 / 业务流程 |
 
-内层 `main_stack` 仅在扫描 Tab 内存在；规则/历史 Tab 直接用 `QWidget` 承载页面，无内层堆叠。
+内层 `main_stack` 仅在需要阶段切换的功能域内存在；纯管理类功能域直接用 `QWidget` 承载页面，无内层堆叠。
 
 ### 4.3 页面内部分组
 
-- **`QGroupBox` 分组**：相关控件聚合为「扫描目标」「规则文件」等组，标题用 `FONT_SIZE_HEADING` 加粗。
-- **`QSplitter` 主从切分**：列表与详情用 `QSplitter`，伸缩比例通过 `setStretchFactor` 设定（如 fusscan 结果列表:详情 = 2:3）。
-- **`QStackedWidget` 双态切换**：详情区常用「空态/非空态」双 `QStackedWidget`（`detail_action_stack` + `detail_main_stack`），根据选中项有无切换。
+- **`QGroupBox` 分组**：相关控件聚合为逻辑分组，标题用 `FONT_SIZE_HEADING` 加粗。
+- **`QSplitter` 主从切分**：列表与详情用 `QSplitter`，伸缩比例通过 `setStretchFactor` 设定（如列表:详情 = 2:3）。
+- **`QStackedWidget` 双态切换**：详情区常用「空态/非空态」双 `QStackedWidget`，根据选中项有无切换。
 
 ### 4.4 尺寸与背景
 
 | 属性 | 值 | 令牌 |
 |------|-----|------|
 | 背景 | 应用底色 | `COLOR_BG_APP` |
-| 页面内边距 | 12px（配置页）/ 0px（扫描中、结果页贴边） | `SPACING_MD` 或 0 |
+| 页面内边距 | 12px（表单页）/ 0px（列表页贴边） | `SPACING_MD` 或 0 |
 | 间距 | 8px | `SPACING_SM` |
 | 卡片/分组背景 | 卡片白 | `COLOR_BG_CARD` |
 | 卡片边框 | 1px `COLOR_BORDER`，圆角 `RADIUS_MD` | — |
 
 ### 4.5 阶段切换状态机
 
-`WorkflowStage` 枚举驱动整页切换与控件可用性：
+阶段枚举驱动整页切换与控件可用性，典型三阶段工作流：
 
 ```
-SETUP ──启动扫描──→ SCANNING ──完成/取消──→ RESULTS
-  ↑                                          │
-  └────────────重新扫描──────────────────────┘
+SETUP ──启动任务──→ RUNNING ──完成/取消──→ RESULTS
+  ↑                                        │
+  └──────────重新配置──────────────────────┘
 ```
 
 切换时须同步：
@@ -176,7 +176,7 @@ SETUP ──启动扫描──→ SCANNING ──完成/取消──→ RESULTS
 1. `main_stack.setCurrentIndex(page_index)`
 2. `sidebar.setCurrentRow(page_index)`（blockSignals 防循环）
 3. `_update_stage_actions()` 更新按钮/菜单可用性
-4. 状态栏永久部件可见性（进度条仅 SCANNING 可见）
+4. 状态栏永久部件可见性（进度条仅 RUNNING 可见）
 
 ## 五、Status（状态栏）
 
@@ -197,13 +197,13 @@ SETUP ──启动扫描──→ SCANNING ──完成/取消──→ RESULTS
 ### 5.3 内容布局
 
 ```
-[左侧汇总文本（stretch=1）]               [当前文件（永久）] [进度条（永久，200px）]
+[左侧汇总文本（stretch=1）]        [当前操作对象（永久）] [进度条（永久，200px）]
 ```
 
-- **左侧**：`stats_label`，通过 `addWidget(widget, stretch=1)` 占据剩余空间，显示汇总（如"已加载 N 条规则""命中 N 个文件"）。
+- **左侧**：汇总标签，通过 `addWidget(widget, stretch=1)` 占据剩余空间，显示统计摘要。
 - **右侧永久部件**：通过 `addPermanentWidget` 追加，从右往左排列：
-  - `current_file_label`：当前处理文件，`setMaximumWidth(400)` 防止过长挤压左侧。
-  - `progress`：`QProgressBar`，`setFixedWidth(200)`，初始 `setRange(0, 100)` 确定模式。
+  - 当前操作对象标签：`setMaximumWidth(400)` 防止过长挤压左侧。
+  - `QProgressBar`：`setFixedWidth(200)`，初始 `setRange(0, 100)` 确定模式。
 - **临时消息**：`showMessage(text, timeout)` 在最左临时覆盖显示，超时自动清除。
 
 ### 5.4 可见性联动
@@ -211,48 +211,48 @@ SETUP ──启动扫描──→ SCANNING ──完成/取消──→ RESULTS
 永久部件随工作流阶段切换可见性：
 
 ```python
-self.progress.setVisible(is_scanning)
-self.current_file_label.setVisible(is_scanning)
+self.progress.setVisible(is_running)
+self.current_item_label.setVisible(is_running)
 ```
 
-非扫描阶段隐藏进度条与当前文件，避免占用状态栏空间。
+非执行阶段隐藏进度条与当前操作对象，避免占用状态栏空间。
 
 ### 5.5 进度条模式
 
 | 场景 | 模式 | 设置 |
 |------|------|------|
 | 未启动 | 确定模式，值 0 | `setRange(0, 100); setValue(0)` |
-| 扫描中（总量未知） | 不确定模式（滚动动画） | `setRange(0, 0)` |
-| 扫描中（总量已知） | 确定模式 | `setRange(0, total); setValue(done)` |
+| 执行中（总量未知） | 不确定模式（滚动动画） | `setRange(0, 0)` |
+| 执行中（总量已知） | 确定模式 | `setRange(0, total); setValue(done)` |
 
-初始为确定模式，避免未启动时显示无意义动画；仅 `_start_scan` 时切换为不确定模式。
+初始为确定模式，避免未启动时显示无意义动画；仅任务真正启动时切换为不确定模式。
 
 ## 六、关联设计与阶段联动
 
 ### 6.1 Sidebar 与 Header Tab 联动
 
-- Header 切换到扫描 Tab → 显示侧边栏，侧边栏保留上次选中阶段。
-- Header 切换到规则/历史 Tab → 隐藏侧边栏，整页切换。
+- Header 切换到主任务 Tab → 显示侧边栏，侧边栏保留上次选中阶段。
+- Header 切换到管理类 Tab → 隐藏侧边栏，整页切换。
 - 侧边栏不跨 Tab 持久化选中项（各 Tab 独立阶段）。
 
 ### 6.2 Sidebar 与 Content 阶段联动
 
 - 侧边栏选中项变化 → `main_stack` 切换对应页 → `_update_stage_actions` 刷新控件可用性。
-- 业务流程驱动阶段切换（如启动扫描自动跳到 SCANNING）→ 反向同步侧边栏选中项（blockSignals 防循环）。
+- 业务流程驱动阶段切换（如启动任务自动跳到 RUNNING）→ 反向同步侧边栏选中项（blockSignals 防循环）。
 
 ### 6.3 Status 与阶段联动
 
 - SETUP/RESULTS：仅显示左侧汇总文本。
-- SCANNING：追加显示当前文件标签与进度条。
-- 进度条模式随扫描状态切换（确定↔不确定）。
+- RUNNING：追加显示当前操作对象标签与进度条。
+- 进度条模式随任务状态切换（确定↔不确定）。
 
 ## 七、QSplitter 伸缩规则
 
 | Splitter | 子部件 | 比例 | 说明 |
 |----------|--------|------|------|
 | `sidebar_splitter` | sidebar : main_stack | 0 : 1（stretch），初始 220:1060 | 侧边栏固定宽，内容区伸缩 |
-| `results_splitter` | 结果列表 : 详情区 | 2 : 3 | 详情区优先扩展 |
-| `lists_splitter` | 跳过目录 : 命中文件 | 1 : 1 | 等分 |
+| 列表-详情 splitter | 列表 : 详情区 | 2 : 3 | 详情区优先扩展 |
+| 双列表 splitter | 列表 A : 列表 B | 1 : 1 | 等分 |
 
 设置方式：
 
@@ -282,4 +282,4 @@ splitter.setSizes([220, 1060])   # 初始尺寸
 | Content | 应用底色（浅） | 主色 | `COLOR_PRIMARY` |
 | Status | 卡片白（浅） | 次级文字 | `COLOR_TEXT_SECONDARY` |
 
-着色通过 `_load_themed_icon(svg_path, color)` 实现：读取 SVG 文本 → 移除所有 `fill` 属性 → 在根 `<svg>` 标签注入 `fill="<color>"` → `QSvgRenderer` 渲染到 `QPixmap` → 构造 `QIcon`。主题色变更时须重建所有图标。
+着色通过 `load_themed_icon(svg_path, color)` 实现：读取 SVG 文本 → 移除所有 `fill` 属性 → 在根 `<svg>` 标签注入 `fill="<color>"` → `QSvgRenderer` 渲染到 `QPixmap` → 构造 `QIcon`。主题色变更时须重建所有图标。
