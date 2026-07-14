@@ -111,7 +111,7 @@ tests/
 | `TOOLBAR_HEIGHT` | 44px | 工具栏高度 |
 | `STATUSBAR_HEIGHT` | 28px | 状态栏高度 |
 
-令牌的使用场景、配色比例、组件设计、交互模式与状态规范见 `UI-DESIGN.md`。四区主窗口（Header/Sidebar/Content/Status）的结构、尺寸、状态机与联动规则见 `LAYOUT.md`。
+令牌的使用场景、配色比例、组件设计、交互模式与状态规范见 `UI-DESIGN.md`；四区结构（Header/Sidebar/Content/Status）、阶段联动与 Splitter 规则见 `LAYOUT.md`；表单验证、数据模型、会话状态、快捷键、进度对话框、消息框、拖放、动画、错误处理、上下文菜单等实现模式见 `PATTERNS.md`。
 
 ## 最佳实践
 
@@ -473,7 +473,96 @@ class MainWindow(QMainWindow):
             self.sidebar.set_folded(False)
 ```
 
-### 5. widgets/sidebar.py — 侧边栏导航
+### 5. widgets/header.py — 头部条
+
+```python
+"""头部条：QFrame + QButtonGroup 互斥 Tab + 右侧辅助按钮。"""
+
+from __future__ import annotations
+
+from typing import List
+
+try:
+    from PySide2.QtCore import Signal
+    from PySide2.QtWidgets import (
+        QButtonGroup, QFrame, QHBoxLayout, QPushButton, QSpacerItem,
+        QSizePolicy, QWidget,
+    )
+except ImportError:
+    from PySide6.QtCore import Signal
+    from PySide6.QtWidgets import (
+        QButtonGroup, QFrame, QHBoxLayout, QPushButton, QSpacerItem,
+        QSizePolicy, QWidget,
+    )
+
+from {{ package_name }} import theme
+
+__all__ = ["HeaderBar"]
+
+
+class HeaderBar(QFrame):
+    """头部条：左侧 Tab 按钮组（互斥）+ 右侧辅助按钮。
+
+    tab_changed 信号在用户点击 Tab 时发出，携带 tab 索引。
+    """
+
+    tab_changed = Signal(int)
+
+    def __init__(
+        self,
+        tabs: List[str],
+        actions: List[tuple[str, object]] | None = None,
+        parent: QWidget | None = None,
+    ) -> None:
+        """初始化头部条。
+
+        Args:
+            tabs: Tab 按钮文本列表
+            actions: 右侧辅助按钮 [(文本, 回调), ...]
+            parent: 父部件
+        """
+        super().__init__(objectName="headerBar", parent=parent)
+        self.setFixedHeight(theme.HEADER_HEIGHT)
+        self._build_ui(tabs, actions or [])
+
+    def _build_ui(self, tabs: List[str], actions: list[tuple[str, object]]) -> None:
+        """组装头部条布局。"""
+        layout = QHBoxLayout(self)
+        layout.setContentsMargins(theme.SPACING_SM, theme.SPACING_XS, theme.SPACING_SM, theme.SPACING_XS)
+        layout.setSpacing(theme.SPACING_XS)
+
+        # 左侧 Tab 按钮组（互斥）
+        self._tab_group = QButtonGroup(self)
+        self._tab_group.setExclusive(True)
+        for i, text in enumerate(tabs):
+            btn = QPushButton(text, objectName="headerBtn")
+            btn.setCheckable(True)
+            self._tab_group.addButton(btn, id=i)
+            layout.addWidget(btn)
+        if self._tab_group.buttons():
+            self._tab_group.buttons()[0].setChecked(True)
+        self._tab_group.idClicked.connect(self.tab_changed.emit)
+
+        # 弹簧填充
+        layout.addItem(QSpacerItem(0, 0, QSizePolicy.Expanding, QSizePolicy.Minimum))
+
+        # 右侧辅助按钮
+        for text, callback in actions:
+            btn = QPushButton(text, objectName="headerBtn")
+            if callback:
+                btn.clicked.connect(callback)
+            layout.addWidget(btn)
+
+    def set_current_tab(self, index: int) -> None:
+        """程序化切换 Tab（blockSignals 避免循环触发）。"""
+        btn = self._tab_group.button(index)
+        if btn:
+            self._tab_group.blockSignals(True)
+            btn.setChecked(True)
+            self._tab_group.blockSignals(False)
+```
+
+### 6. widgets/sidebar.py — 侧边栏导航
 
 ```python
 """侧边栏导航：QListWidget，选中态高亮 + 左侧强调竖条。"""
@@ -517,7 +606,7 @@ class Sidebar(QListWidget):
         self.setFixedWidth(_ICON_BAR_WIDTH if folded else theme.SIDEBAR_WIDTH)
 ```
 
-### 6. workers/task_worker.py — QThread Worker 模式
+### 7. workers/task_worker.py — QThread Worker 模式
 
 ```python
 """QThread Worker 模式：QObject 子类 + moveToThread，信号跨线程回主线程。"""
@@ -592,7 +681,7 @@ class WorkerController(QObject):
         """任务结束回调（子类可重写或外接信号）。"""
 ```
 
-### 7. dialogs/settings_dialog.py — 对话框模式
+### 8. dialogs/settings_dialog.py — 对话框模式
 
 ```python
 """设置对话框：QDialog + QFormLayout，模态执行。"""
