@@ -3,7 +3,7 @@
 > 基于 [copier](https://copier.readthedocs.io/) 的通用 Python 项目模板。
 
 [![PyPI](https://img.shields.io/pypi/v/coopie)](https://pypi.org/project/coopie/)
-[![CI](https://github.com/gooker_young/coopie/actions/workflows/ci.yml/badge.svg)](https://github.com/gooker_young/coopie/actions/workflows/ci.yml)
+[![CI](https://github.com/gookeryoung/coopie/actions/workflows/ci.yml/badge.svg)](https://github.com/gooker_young/coopie/actions/workflows/ci.yml)
 ![Python](https://img.shields.io/badge/python-3.8%2B-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 ![Coverage](https://img.shields.io/badge/coverage-%E2%89%A595%25-brightgreen.svg)

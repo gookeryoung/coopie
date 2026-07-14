@@ -2,7 +2,7 @@
 _commit: v0.7.12
 _src_path: https://gitee.com/gooker_young/coopie.git
 author_email: gooker_young@qq.com
-author_name: gooker_young
+author_name: gookeryoung
 coverage_fail_under: 95
 description: 基于 [copier](https://copier.readthedocs.io/) 的通用 Python 项目模板。
 initial_version: 0.1.8
