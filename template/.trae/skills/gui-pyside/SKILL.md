@@ -111,7 +111,7 @@ tests/
 | `TOOLBAR_HEIGHT` | 44px | 工具栏高度 |
 | `STATUSBAR_HEIGHT` | 28px | 状态栏高度 |
 
-令牌的使用场景、配色比例、组件设计、交互模式与状态规范见 `UI-DESIGN.md`。
+令牌的使用场景、配色比例、组件设计、交互模式与状态规范见 `UI-DESIGN.md`。四区主窗口（Header/Sidebar/Content/Status）的结构、尺寸、状态机与联动规则见 `LAYOUT.md`。
 
 ## 最佳实践
 
