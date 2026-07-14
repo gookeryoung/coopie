@@ -1,5 +1,5 @@
 ---
-name: "gui-pyside"
+name: "python-gui-pyside"
 description: "PySide2/PySide6 桌面 GUI 开发技能：提供设计令牌、四区布局、信号槽、QThread、QSS 样式等可复用代码模板与最佳实践。当需要创建或修改 Qt 桌面应用界面、编写 PySide 代码、生成 GUI 项目或搭建主窗口/侧边栏/对话框时调用。"
 ---
 

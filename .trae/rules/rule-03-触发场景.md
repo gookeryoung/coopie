@@ -22,5 +22,5 @@ Python 项目须遵守 `rule-11-python-standards.md` 硬约束；涉及以下领
 
 ## 项目场景
 
-- PySide2/PySide6 GUI 项目（`project_type=gui`）：开发前**必须**调用 `python-gui-pyside` SKILL（见 rule-12）。
+- PySide2/PySide6 GUI 项目（`project_type=gui`）：开发前**必须**调用 `python-gui-pyside` SKILL。
 - FastAPI Web 项目（`project_type=web`）：开发前**必须**调用 `python-fastapi` SKILL。

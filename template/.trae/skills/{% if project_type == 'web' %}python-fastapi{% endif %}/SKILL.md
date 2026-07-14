@@ -1,5 +1,5 @@
 ---
-name: "fastapi"
+name: "python-fastapi"
 description: "FastAPI Web 服务开发技能：路由、Pydantic 模型、依赖注入、中间件、后台任务、异步处理、异常处理、TestClient 测试等代码模板。当需要创建或修改 FastAPI 应用、定义 API 路由、设计请求/响应模型、实现依赖注入、编写异步处理器或测试 Web 接口时调用。"
 ---
 
