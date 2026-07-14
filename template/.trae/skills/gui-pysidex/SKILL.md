@@ -14,6 +14,20 @@ description: "PySide2/PySide6 桌面 GUI 开发技能：提供设计令牌、四
 - 需要 QThread 后台任务、QSS 样式、信号槽跨线程通信等 Qt 专项模式
 - 用户提到 PySide2 / PySide6 / Qt 桌面应用 / QWidget / 主窗口 / 侧边栏导航
 
+## 双兼容（关键约束）
+
+- 模板按 Python 版本自动区分绑定：`PySide2`（≤3.10）/ `PySide6`（≥3.11），代码须双兼容。
+- 导入一律 `try: PySide2 except ImportError: PySide6`；事件循环 `app.exec if hasattr(app, "exec") else app.exec_`。
+- 枚举跨版本用短名（如 `Qt.AlignCenter`，两代均支持）；仅 PySide6 用全路径。
+- 依赖声明由模板自动生成，勿手改：
+
+```toml
+dependencies = [
+    "PySide2>=5.15.2.1; python_version <= '3.10'",
+    "PySide6>=6.5.0; python_version >= '3.11'",
+]
+```
+
 ## 项目骨架（GUI 项目文件布局）
 
 ```
