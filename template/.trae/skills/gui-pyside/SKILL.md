@@ -111,6 +111,8 @@ tests/
 | `TOOLBAR_HEIGHT` | 44px | 工具栏高度 |
 | `STATUSBAR_HEIGHT` | 28px | 状态栏高度 |
 
+令牌的使用场景、配色比例、组件设计、交互模式与状态规范见 `UI-DESIGN.md`。
+
 ## 最佳实践
 
 1. **双兼容优先**：导入一律 `try: PySide2 except ImportError: PySide6`；事件循环用 `app.exec if hasattr(app, "exec") else app.exec_`；枚举跨版本用短名 `Qt.AlignCenter`（两代均支持）。
