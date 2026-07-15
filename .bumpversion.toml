@@ -1,5 +1,5 @@
 [tool.bumpversion]
-current_version = "0.1.0"
+current_version = "0.8.2"
 commit = true
 exclude = ["template/*"]
 message = "chore: 更新版本 {current_version} → {new_version}"
@@ -13,7 +13,7 @@ search = '(version\s+=\s+)"{current_version}"'
 replace = '\1"{new_version}"'
 
 [[tool.bumpversion.files]]
-filename = "src/{{ package_name }}/__init__.py"
+filename = "src/coopie/__init__.py"
 search = '__version__ = "{current_version}"'
 replace = '__version__ = "{new_version}"'
 
