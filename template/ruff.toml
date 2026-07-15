@@ -1,4 +1,4 @@
-extend-exclude = ["template"]
+extend-exclude = ["template", "docs"]
 line-length    = 120
 target-version = "{{ target_py }}"
 
