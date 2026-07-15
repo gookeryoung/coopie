@@ -194,3 +194,4 @@ _skip_if_exists:
   - "README.md"
   - "LICENSE"
   - "src/*/__init__.py"
+  - "src/{{ project_name }}/*.py"
