@@ -12,6 +12,7 @@
 
 from __future__ import annotations
 
+import os
 import subprocess
 from pathlib import Path
 from typing import Optional
@@ -85,9 +86,15 @@ def update(
 
 
 def _run_copier(cmd: list[str]) -> None:
-    """执行 copier 命令，处理常见错误."""
+    """执行 copier 命令，处理常见错误.
+
+    copier 内部用 ``pathlib.Path.read_text()`` 读取 ``.copier-answers.yml`` 未指定编码，
+    在 Windows GBK 区域会因非 ASCII 内容（如中文描述）触发 UnicodeDecodeError。
+    启用 Python UTF-8 模式（PEP 540）使子进程默认编码为 UTF-8，Linux/macOS 无影响。
+    """
+    env = {**os.environ, "PYTHONUTF8": "1"}
     try:
-        subprocess.run(cmd, check=True)
+        subprocess.run(cmd, check=True, env=env)
     except FileNotFoundError as exc:
         typer.secho(
             "错误：未找到 copier 命令，请确认 copier 已安装（pip install copier）",

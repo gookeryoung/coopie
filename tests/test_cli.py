@@ -221,3 +221,23 @@ def test_update_with_defaults_flag(monkeypatch: pytest.MonkeyPatch, tmp_path: Pa
 
     assert result.exit_code == 0
     assert "--defaults" in calls[0]
+
+
+def test_run_copier_sets_utf8_mode(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    """_run_copier 应设置 PYTHONUTF8=1 避免 Windows GBK 区域读取中文 answers 失败."""
+    project_dir = tmp_path / "my-project"
+    project_dir.mkdir()
+    (project_dir / ".copier-answers.yml").write_text("# test", encoding="utf-8")
+
+    captured_env: dict[str, str] = {}
+
+    def fake_run(cmd: list[str], **kwargs: Any) -> subprocess.CompletedProcess[str]:
+        captured_env.update(kwargs.get("env", {}))
+        return subprocess.CompletedProcess(cmd, 0, "", "")
+
+    monkeypatch.setattr("coopie.cli.subprocess.run", fake_run)
+
+    result = runner.invoke(app, ["update", str(project_dir)])
+
+    assert result.exit_code == 0
+    assert captured_env.get("PYTHONUTF8") == "1"
