@@ -21,7 +21,7 @@ license         = "MIT"
 name            = "coopie"
 readme          = "README.md"
 requires-python = ">=3.9"
-version         = "0.8.0"
+version         = "0.8.1"
 
 [project.scripts]
 coopie = "coopie.cli:main"
@@ -119,7 +119,7 @@ search-path      = ["."]
 
 # bump-my-version 配置 - 用于管理模板版本号（copier 通过 git tag 识别模板版本）
 [tool.bumpversion]
-current_version = "0.8.0"
+current_version = "0.8.1"
 commit = true
 exclude = ["template/*", ".trae/**"]
 message = "chore: 更新版本 {current_version} → {new_version}"
