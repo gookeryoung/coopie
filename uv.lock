@@ -239,7 +239,7 @@ wheels = [
 
 [[package]]
 name = "coopie"
-version = "0.8.4"
+version = "0.8.5"
 source = { editable = "." }
 dependencies = [
     { name = "copier", version = "9.3.1", source = { registry = "https://mirrors.aliyun.com/pypi/simple/" }, marker = "python_full_version < '3.9'" },
