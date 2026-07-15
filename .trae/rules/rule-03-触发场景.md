@@ -19,6 +19,7 @@ Python 项目须遵守 `rule-11-python-standards.md` 硬约束；涉及以下领
 - 日志（dictConfig/文件轮转/结构化日志/GUI 日志面板/CLI --verbose）→ `python-logging` SKILL
 - 配置管理（TOML 读取/环境变量/.env/多层覆盖/Pydantic Settings/热重载）→ `python-config` SKILL
 - 子进程（subprocess.run/Popen/流式输出/超时/管道/GUI 集成/安全准则）→ `python-subprocess` SKILL
+- 性能（基线测量/cProfile 热点剖析/memray 内存分析/pytest-benchmark 回归门禁）→ `python-performance` SKILL
 
 ## 项目场景
 
