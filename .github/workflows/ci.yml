@@ -66,13 +66,15 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      - name: Install copier
-        run: uvx copier --version
+      - name: Install uv
+        uses: astral-sh/setup-uv@v8.3.2
+        with:
+          enable-cache: true
 
       - name: Render template
         run: |
           mkdir -p .preview
-          uvx copier copy --trust --defaults --vcs-ref HEAD . .preview/out --data project_type=${{ matrix.project-type }}
+          uvx --with jinja2-time copier copy --trust --defaults --vcs-ref HEAD . .preview/out --data project_type=${{ matrix.project-type }}
 
       - name: Verify rendered structure
         run: |

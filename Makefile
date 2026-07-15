@@ -40,13 +40,13 @@ doc: ## 构建 Sphinx 文档
 render: ## 渲染验证四种 project_type（输出到 .preview/）
 	@rm -rf .preview && mkdir .preview
 	@echo "渲染 library..."
-	@uvx copier copy --trust --defaults --vcs-ref HEAD . .preview/lib || true
+	@uvx --with jinja2-time copier copy --trust --defaults --vcs-ref HEAD . .preview/lib || true
 	@echo "渲染 cli..."
-	@uvx copier copy --trust --defaults --vcs-ref HEAD . .preview/cli --data project_type=cli || true
+	@uvx --with jinja2-time copier copy --trust --defaults --vcs-ref HEAD . .preview/cli --data project_type=cli || true
 	@echo "渲染 gui..."
-	@uvx copier copy --trust --defaults --vcs-ref HEAD . .preview/gui --data project_type=gui || true
+	@uvx --with jinja2-time copier copy --trust --defaults --vcs-ref HEAD . .preview/gui --data project_type=gui || true
 	@echo "渲染 web..."
-	@uvx copier copy --trust --defaults --vcs-ref HEAD . .preview/web --data project_type=web || true
+	@uvx --with jinja2-time copier copy --trust --defaults --vcs-ref HEAD . .preview/web --data project_type=web || true
 	@echo "渲染完成，检查 .preview/{lib,cli,gui,web}/"
 
 BUMP_PART := $(filter-out bump,$(MAKECMDGOALS))
