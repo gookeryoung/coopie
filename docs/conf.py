@@ -5,19 +5,24 @@ ReadTheDocs 构建项目文档站。
 
 from __future__ import annotations
 
-import re
+import sys
 from pathlib import Path
+
+# 确保 src/ 在 sys.path 中, autodoc 能导入包
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 
 # -- 项目信息 --------------------------------------------------------------
 project = "coopie"
-author = "gooker_young"
-copyright = "2026, gooker_young"
+author = "gookeryoung"
+copyright = "2026, gookeryoung"
 
-# 版本号从 pyproject.toml 读取，避免依赖 src 包导入
-_pyproject = Path(__file__).resolve().parent.parent / "pyproject.toml"
-_match = re.search(r'^version\s*=\s*"([^"]+)"', _pyproject.read_text(encoding="utf-8"), re.MULTILINE)
-release = _match.group(1) if _match else "0.0.0"
-version = release
+try:
+    from coopie import __version__  # type: ignore[import-not-found]
+    release = __version__
+    version = __version__
+except ImportError:
+    release = "0.1.0"
+    version = "0.1.0"
 
 # -- Sphinx 配置 -----------------------------------------------------------
 extensions = [

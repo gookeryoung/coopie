@@ -1,52 +1,58 @@
 coopie
 ======
 
-基于 copier_ 的通用 Python 项目模板，通过 ``coopie`` CLI 或 ``copier copy`` 一键生成开箱即用的工程骨架。
+基于 copier 的通用 Python 项目模板，通过 copier copy 一键生成开箱即用的工程骨架。
 
 .. toctree::
    :maxdepth: 2
    :caption: 目录
 
-   usage
-   parameters
+   api
    changelog
 
 简介
 ====
 
-coopie 是一个 copier_ 模板仓库，用于生成符合现代 Python 工程实践的项目骨架。模板内置 hatchling + uv + ruff + pyrefly + pytest + coverage 工具链，支持 library / cli / gui（PySide2/PySide6）/ web（FastAPI）四种项目类型，并随模板分发完整的开发规则体系（``.trae/rules/``）与 SKILL 文档（``.trae/skills/``）。
+基于 copier 的通用 Python 项目模板，通过 copier copy 一键生成开箱即用的工程骨架。。
 
-coopie 同时发布为 PyPI 包，提供 ``coopie init`` / ``coopie update`` CLI 封装 copier 命令，简化模板调用。
+安装
+====
 
-.. _copier: https://copier.readthedocs.io/
+.. code-block:: bash
 
-快速开始
+   pip install coopie
+
+或使用 uv_:
+
+.. code-block:: bash
+
+   uv add coopie
+
+.. _uv: https://docs.astral.sh/uv/
+
+快速上手
 ========
 
-使用 coopie CLI 创建新项目：
+.. code-block:: python
+
+   import coopie
+
+   # TODO: 添加使用示例
+
+开发
+====
 
 .. code-block:: bash
 
-   uvx coopie init my-project
+   # 安装开发依赖
+   uv sync --extra dev
 
-   # 或使用 GitHub 源
-   coopie init my-project --url https://github.com/gookeryoung/coopie.git
+   # 运行测试
+   uv run pytest
 
-使用 copier 原生命令：
+   # 类型检查
+   uv run pyrefly check .
 
-.. code-block:: bash
-
-   # 国内用户推荐 Gitee 源
-   uvx copier copy --trust https://gitee.com/gooker_young/coopie.git my-project
-
-   # 国外用户可使用 GitHub 源
-   uvx copier copy --trust https://github.com/gookeryoung/coopie.git my-project
-
-更新已有项目：
-
-.. code-block:: bash
-
-   cd my-project
-   coopie update
-
-详细用法见 :doc:`usage`，模板参数说明见 :doc:`parameters`。
+   # 代码风格
+   uv run ruff check .
+   uv run ruff format --check .

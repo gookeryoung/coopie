@@ -57,7 +57,7 @@ __all__ = ["app", "main"]
 
 app = typer.Typer(
     name="coopie",
-    help="基于 [copier](https://copier.readthedocs.io/) 的通用 Python 项目模板。",
+    help="基于 copier 的通用 Python 项目模板，通过 copier copy 一键生成开箱即用的工程骨架。",
     no_args_is_help=True,  # 无参数时显示帮助
 )
 
@@ -95,7 +95,7 @@ from coopie import __version__
 __all__ = ["cli", "main"]
 
 
-@click.group(help="基于 [copier](https://copier.readthedocs.io/) 的通用 Python 项目模板。")
+@click.group(help="基于 copier 的通用 Python 项目模板，通过 copier copy 一键生成开箱即用的工程骨架。")
 @click.version_option(version=__version__, prog_name="coopie")
 def cli() -> None:
     """coopie 命令组."""
@@ -218,7 +218,7 @@ import typer
 
 from coopie import cli_db
 
-app = typer.Typer(name="coopie", help="基于 [copier](https://copier.readthedocs.io/) 的通用 Python 项目模板。", no_args_is_help=True)
+app = typer.Typer(name="coopie", help="基于 copier 的通用 Python 项目模板，通过 copier copy 一键生成开箱即用的工程骨架。", no_args_is_help=True)
 
 # 合并子模块命令组：coopie db migrate / coopie db backup
 app.add_typer(cli_db.app, name="db", help="数据库管理")

@@ -2,6 +2,7 @@
 authors = [{ name = "gooker_young", email = "gooker_young@qq.com" }]
 classifiers = [
     "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
@@ -14,7 +15,7 @@ classifiers = [
 dependencies    = [
     "copier>=9.0.0",
     "jinja2-time>=0.2.0",
-    "typer>=0.12.0",
+    "typer>=0.23.0",
 ]
 description     = "基于 copier 的通用 Python 项目模板，通过 coopie CLI 或 copier copy 一键生成开箱即用的工程骨架。"
 license         = "MIT"
