@@ -246,6 +246,7 @@ dependencies = [
     { name = "copier", version = "9.10.3", source = { registry = "https://mirrors.aliyun.com/pypi/simple/" }, marker = "python_full_version == '3.9.*'" },
     { name = "copier", version = "9.17.0", source = { registry = "https://mirrors.aliyun.com/pypi/simple/" }, marker = "python_full_version >= '3.10'" },
     { name = "jinja2-time" },
+    { name = "prompt-toolkit" },
     { name = "typer", version = "0.20.1", source = { registry = "https://mirrors.aliyun.com/pypi/simple/" }, marker = "python_full_version < '3.9'" },
     { name = "typer", version = "0.23.2", source = { registry = "https://mirrors.aliyun.com/pypi/simple/" }, marker = "python_full_version == '3.9.*'" },
     { name = "typer", version = "0.26.8", source = { registry = "https://mirrors.aliyun.com/pypi/simple/" }, marker = "python_full_version >= '3.10'" },
@@ -306,6 +307,7 @@ requires-dist = [
     { name = "jinja2-time", specifier = ">=0.2.0" },
     { name = "myst-parser", marker = "extra == 'docs'", specifier = ">=3.0" },
     { name = "prek", marker = "extra == 'dev'", specifier = ">=0.4.5" },
+    { name = "prompt-toolkit", specifier = "<3.0.52" },
     { name = "pyrefly", marker = "extra == 'lint'", specifier = ">=1.1.1" },
     { name = "pytest", marker = "extra == 'test'", specifier = ">=8.0.0" },
     { name = "pytest-cov", marker = "extra == 'test'", specifier = ">=5.0.0" },
@@ -1416,14 +1418,14 @@ wheels = [
 
 [[package]]
 name = "prompt-toolkit"
-version = "3.0.52"
+version = "3.0.51"
 source = { registry = "https://mirrors.aliyun.com/pypi/simple/" }
 dependencies = [
     { name = "wcwidth" },
 ]
-sdist = { url = "https://mirrors.aliyun.com/pypi/packages/a1/96/06e01a7b38dce6fe1db213e061a4602dd6032a8a97ef6c1a862537732421/prompt_toolkit-3.0.52.tar.gz", hash = "sha256:28cde192929c8e7321de85de1ddbe736f1375148b02f2e17edd840042b1be855" }
+sdist = { url = "https://mirrors.aliyun.com/pypi/packages/bb/6e/9d084c929dfe9e3bfe0c6a47e31f78a25c54627d64a66e884a8bf5474f1c/prompt_toolkit-3.0.51.tar.gz", hash = "sha256:931a162e3b27fc90c86f1b48bb1fb2c528c2761475e57c9c06de13311c7b54ed" }
 wheels = [
-    { url = "https://mirrors.aliyun.com/pypi/packages/84/03/0d3ce49e2505ae70cf43bc5bb3033955d2fc9f932163e84dc0779cc47f48/prompt_toolkit-3.0.52-py3-none-any.whl", hash = "sha256:9aac639a3bbd33284347de5ad8d68ecc044b91a762dc39b7c21095fcd6a19955" },
+    { url = "https://mirrors.aliyun.com/pypi/packages/ce/4f/5249960887b1fbe561d9ff265496d170b55a735b76724f10ef19f9e40716/prompt_toolkit-3.0.51-py3-none-any.whl", hash = "sha256:52742911fde84e2d423e2f9a4cf1de7d7ac4e51958f648d9540e0fb8db077b07" },
 ]
 
 [[package]]
