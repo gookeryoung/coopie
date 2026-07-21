@@ -74,7 +74,8 @@ uv run pytest -m "not slow" --cov=coopie --cov-fail-under=95
 
 - 覆盖率 ≥ 95%（branch），不得下降。
 - 公共 API 优先通过公共接口测试；故障注入可临时访问私有属性（docstring 注明）。
-- 命名 `test_<对象>_<场景>`；原生 `assert`，禁用 `self.assertEqual`；`pytest.raises` 必填 `match=`。
+- 命名按`test_<包>_<模块>.py`格式, 如 `test_cli_file.py`，禁止按迭代阶段聚合。
+- 原生 `assert`，禁用 `self.assertEqual`；`pytest.raises` 必填 `match=`。
 - Mock 优先级：`monkeypatch` > 内联 stub > `unittest.mock` > `pytest-mock`。禁用 `@patch` 装饰器、`mock.patch.object` 上下文、`pytest-mock` 的 `mocker` fixture。
 - fixture 优先 `tmp_path`/`monkeypatch`/`capsys`；autouse 仅全局必需时用。耗时测试加 `@pytest.mark.slow`；`tests/**` 忽略 `ARG001`/`ARG002`。
 

@@ -9,10 +9,10 @@ glob: "*.{py,pyi}"
 
 | 工具 | 配置文件 | 配置要点 |
 |------|---------|---------|
-| ruff | `ruff.toml` | `line-length=120`，`target-version="{{ target_py }}"` |
-| pyrefly | `pyrefly.toml` | `preset="strict"`，`python-version="{{ min_python_version }}"` |
+| ruff | `ruff.toml` | `line-length=120`，`target-version="py38"` |
+| pyrefly | `pyrefly.toml` | `preset="strict"`，`python-version="3.8"` |
 | pytest | `pytest.ini` | `asyncio_default_fixture_loop_scope="function"`，marker `slow` |
-| coverage | `.coveragerc` | `branch=true`，`fail_under={{ coverage_fail_under }}`，`concurrency=thread` |
+| coverage | `.coveragerc` | `branch=true`，`fail_under=95`，`concurrency=thread` |
 | bump-my-version | `.bumpversion.toml` | `current_version` 同步 `pyproject.toml` 与 `__init__.py` |
 | uv | `uv.toml` | `required-version`，国内镜像源（可选） |
 | pre-commit | `.pre-commit-config.yaml` | ruff `--fix` + trailing-whitespace + end-of-file-fixer |
@@ -23,14 +23,14 @@ glob: "*.{py,pyi}"
 uv run ruff check src tests
 uv run ruff format --check src tests
 uv run pyrefly check
-uv run pytest -m "not slow" --cov={{ package_name }} --cov-fail-under={{ coverage_fail_under }}
+uv run pytest -m "not slow" --cov=coopie --cov-fail-under=95
 ```
 
 详细参考：工具链配置拆分决策与完整示例见 `python-project-structure` SKILL「工具链配置拆分」章节；覆盖率排除规则与 `# pragma: no cover` 见 `python-testing` SKILL「覆盖率」章节。
 
 ## 兼容性
 
-- 最低 Python {{ min_python_version }}：用 `from __future__ import annotations` 延迟注解求值；按版本 `typing.List` → 内置泛型(3.9) → `X | Y`(3.10) → `typing.override`(3.12)。
+- 最低 Python 3.8：用 `from __future__ import annotations` 延迟注解求值；按版本 `typing.List` → 内置泛型(3.9) → `X | Y`(3.10) → `typing.override`(3.12)。
 - 版本守卫：`if sys.version_info >= (3, X):` 引入高版本 API；低版本回退加 `# pragma: no cover`。
 - 优先标准库；`typing-extensions` 用于 `override`/`TypeVar` 前向兼容（`python_version < '3.13'` 时引入）。新增依赖须审慎。
 
@@ -72,9 +72,10 @@ uv run pytest -m "not slow" --cov={{ package_name }} --cov-fail-under={{ coverag
 
 ## 测试
 
-- 覆盖率 ≥ {{ coverage_fail_under }}%（branch），不得下降。
+- 覆盖率 ≥ 95%（branch），不得下降。
 - 公共 API 优先通过公共接口测试；故障注入可临时访问私有属性（docstring 注明）。
-- 命名 `test_<对象>_<场景>`；原生 `assert`，禁用 `self.assertEqual`；`pytest.raises` 必填 `match=`。
+- 命名按`test_<包>_<模块>.py`格式, 如 `test_cli_file.py`，禁止按迭代阶段聚合。
+- 原生 `assert`，禁用 `self.assertEqual`；`pytest.raises` 必填 `match=`。
 - Mock 优先级：`monkeypatch` > 内联 stub > `unittest.mock` > `pytest-mock`。禁用 `@patch` 装饰器、`mock.patch.object` 上下文、`pytest-mock` 的 `mocker` fixture。
 - fixture 优先 `tmp_path`/`monkeypatch`/`capsys`；autouse 仅全局必需时用。耗时测试加 `@pytest.mark.slow`；`tests/**` 忽略 `ARG001`/`ARG002`。
 
