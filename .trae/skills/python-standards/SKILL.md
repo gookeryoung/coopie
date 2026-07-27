@@ -1,9 +1,18 @@
 ---
-name: "rule-11-python-standards"
-glob: "*.{py,pyi}"
+name: "python-standards"
+description: "Python 开发硬约束简表：工具链、兼容性、类型注解、数据结构、模块与导入、函数设计、异常处理、并发、测试、代码风格、Pythonic 风格、日志、路径与资源、安全、性能、Git 与提交。当编写或审查 Python 代码、需要跨领域通用硬约束参考时调用。各领域详细模式与代码模板见对应专项 SKILL。"
 ---
 
-# Python 开发规范
+# Python 开发硬约束简表
+
+自包含的 Python 开发硬约束简表，覆盖工具链、兼容性、类型注解、数据结构、模块与导入、函数设计、异常处理、并发、测试、代码风格、Pythonic 风格、日志、路径与资源、安全、性能、Git 与提交。本 SKILL 是跨领域通用约束的总纲，各领域详细模式与代码模板见对应专项 SKILL（调用指引见 `rule-03-触发场景.md`）。
+
+## 何时调用
+
+- 编写或修改 Python 代码（任意项目类型：library/cli/gui/web）
+- 审查 Python 代码质量、风格、类型注解、异常处理
+- 选择工具链配置、测试策略、日志模式
+- 需要跨领域通用 Python 硬约束参考
 
 ## 工具链（独立配置文件，pyproject.toml 仅含项目元数据）
 
@@ -119,7 +128,7 @@ uv run pytest -m "not slow" --cov=coopie --cov-fail-under=95
 
 ## 详细参考
 
-本规则为硬约束简表，各领域详细模式与代码模板见对应 SKILL（调用指引见 `rule-03-触发场景.md`）：
+本 SKILL 为硬约束简表，各领域详细模式与代码模板见对应 SKILL（调用指引见 `rule-03-触发场景.md`）：
 
 | 章节 | 对应 SKILL |
 |------|-----------|

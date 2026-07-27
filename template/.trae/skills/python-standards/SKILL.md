@@ -1,18 +1,27 @@
 ---
-name: "rule-11-python-standards"
-glob: "*.{py,pyi}"
+name: "python-standards"
+description: "Python 开发硬约束简表：工具链、兼容性、类型注解、数据结构、模块与导入、函数设计、异常处理、并发、测试、代码风格、Pythonic 风格、日志、路径与资源、安全、性能、Git 与提交。当编写或审查 Python 代码、需要跨领域通用硬约束参考时调用。各领域详细模式与代码模板见对应专项 SKILL。"
 ---
 
-# Python 开发规范
+# Python 开发硬约束简表
+
+自包含的 Python 开发硬约束简表，覆盖工具链、兼容性、类型注解、数据结构、模块与导入、函数设计、异常处理、并发、测试、代码风格、Pythonic 风格、日志、路径与资源、安全、性能、Git 与提交。本 SKILL 是跨领域通用约束的总纲，各领域详细模式与代码模板见对应专项 SKILL（调用指引见 `rule-03-触发场景.md`）。
+
+## 何时调用
+
+- 编写或修改 Python 代码（任意项目类型：library/cli/gui/web）
+- 审查 Python 代码质量、风格、类型注解、异常处理
+- 选择工具链配置、测试策略、日志模式
+- 需要跨领域通用 Python 硬约束参考
 
 ## 工具链（独立配置文件，pyproject.toml 仅含项目元数据）
 
 | 工具 | 配置文件 | 配置要点 |
 |------|---------|---------|
-| ruff | `ruff.toml` | `line-length=120`，`target-version="py38"` |
-| pyrefly | `pyrefly.toml` | `preset="strict"`，`python-version="3.8"` |
+| ruff | `ruff.toml` | `line-length=120`，`target-version="{{ target_py }}"` |
+| pyrefly | `pyrefly.toml` | `preset="strict"`，`python-version="{{ min_python_version }}"` |
 | pytest | `pytest.ini` | `asyncio_default_fixture_loop_scope="function"`，marker `slow` |
-| coverage | `.coveragerc` | `branch=true`，`fail_under=95`，`concurrency=thread` |
+| coverage | `.coveragerc` | `branch=true`，`fail_under={{ coverage_fail_under }}`，`concurrency=thread` |
 | bump-my-version | `.bumpversion.toml` | `current_version` 同步 `pyproject.toml` 与 `__init__.py` |
 | uv | `uv.toml` | `required-version`，国内镜像源（可选） |
 | pre-commit | `.pre-commit-config.yaml` | ruff `--fix` + trailing-whitespace + end-of-file-fixer |
@@ -23,7 +32,7 @@ glob: "*.{py,pyi}"
 uv run ruff check src tests
 uv run ruff format --check src tests
 uv run pyrefly check
-uv run pytest -m "not slow" --cov=coopie --cov-fail-under=95
+uv run pytest -m "not slow" --cov={{ package_name }} --cov-fail-under={{ coverage_fail_under }}
 ```
 
 详细参考：工具链配置拆分决策与完整示例见 `python-project-structure` SKILL「工具链配置拆分」章节；覆盖率排除规则与 `# pragma: no cover` 见 `python-testing` SKILL「覆盖率」章节。
@@ -72,7 +81,7 @@ uv run pytest -m "not slow" --cov=coopie --cov-fail-under=95
 
 ## 测试
 
-- 覆盖率 ≥ 95%（branch），不得下降。
+- 覆盖率 ≥ {{ coverage_fail_under }}%（branch），不得下降。
 - 公共 API 优先通过公共接口测试；故障注入可临时访问私有属性（docstring 注明）。
 - 命名按`test_<包>_<模块>.py`格式, 如 `test_cli_file.py`，禁止按迭代阶段聚合。
 - 原生 `assert`，禁用 `self.assertEqual`；`pytest.raises` 必填 `match=`。
@@ -119,7 +128,7 @@ uv run pytest -m "not slow" --cov=coopie --cov-fail-under=95
 
 ## 详细参考
 
-本规则为硬约束简表，各领域详细模式与代码模板见对应 SKILL（调用指引见 `rule-03-触发场景.md`）：
+本 SKILL 为硬约束简表，各领域详细模式与代码模板见对应 SKILL（调用指引见 `rule-03-触发场景.md`）：
 
 | 章节 | 对应 SKILL |
 |------|-----------|

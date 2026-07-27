@@ -5,7 +5,7 @@ description: "FastAPI Web 服务开发技能：路由、Pydantic 模型、依赖
 
 # FastAPI Web 服务开发
 
-自包含的 FastAPI 指南：路由、模型、依赖注入、中间件、异步、测试。基于 FastAPI + uvicorn + Pydantic v2。所有代码遵循 `rule-11-python-standards.md`（类型注解、中文 docstring）。
+自包含的 FastAPI 指南：路由、模型、依赖注入、中间件、异步、测试。基于 FastAPI + uvicorn + Pydantic v2。所有代码遵循 `python-standards` SKILL（类型注解、中文 docstring）。
 
 ## 何时调用
 
