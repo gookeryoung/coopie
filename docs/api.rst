@@ -1,5 +1,5 @@
 API 参考
-=======
+========
 
 .. automodule:: coopie
    :members:

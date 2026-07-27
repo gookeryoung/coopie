@@ -6,7 +6,7 @@ v0.9.0（未发布）
 
 - **breaking**: 恢复 ``coopie`` CLI 工具（``src/coopie/cli.py``），反转 iter-22 的纯模板仓库决策
 - **breaking**: 恢复 PyPI 发布流程（``release.yml`` 使用 OIDC trusted publishing）
-- **breaking**: ``requires-python`` 从 ``>=3.8`` 升至 ``>=3.9``（copier 9 最低要求）
+- **breaking**: ``requires-python`` 从 3.8 升至 3.9（copier 9 最低要求）
 - 新增 ``coopie init`` 命令，封装 ``copier copy --trust``，默认 Gitee 源，支持 ``--url``/``--vcs-ref``/``--defaults``
 - 新增 ``coopie update`` 命令，封装 ``copier recopy --trust``，默认当前目录
 - 依赖 ``copier>=9.0.0`` + ``jinja2-time>=0.2.0`` + ``typer>=0.12.0``
