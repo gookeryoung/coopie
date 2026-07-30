@@ -122,7 +122,7 @@ uv run pytest -m "not slow" --cov=coopie --cov-fail-under=95
 
 ## Git 与提交
 
-- 任务完成后自动 `git add`（按文件名）+ `git commit`（遵循 `rule-09-git提交规则.md` 风格）+ `git push`（分支已跟踪远程时；新分支跳过并在总结说明）。
+- 任务完成后自动 `git add`（按文件名）+ `git commit`（遵循 `git-commit-message.md` 风格）+ `git push`（分支已跟踪远程时；新分支跳过并在总结说明）。
 - 破坏性命令的暂停边界遵循 `rule-01-开发流程.md` 暂停条件：`force-push`、工作区有改动时的 `reset --hard`、`git clean -f`/`-fd`/`-fx` 需暂停；`git clean -fX`、`git stash`/`stash pop`、`git revert`、工作区干净时的 `reset --hard` 可自主执行。
 - staging 按文件名添加，不用 `git add -A`/`git add .`。
 
