@@ -1,8 +1,26 @@
 ---
+name: "git-commit-message"
 alwaysApply: true
-scene: git_message
 ---
 
+## 提交前门禁
+
+**每次 `git commit` 前必须本地通过 `make check`，无例外。** 这是对 CI/CD 的最低尊重，禁止"先提交再说，CI 跑了再修"。
+
+- **强制门禁命令**：`make check`（= `lint` + `typecheck` + `cov`，定义见 `Makefile`）。三项必须全绿方可 `git add` / `git commit` / `git push`。
+- **失败即阻断**：lint / typecheck / cov 任一项失败时禁止任何提交动作；必须定位根因修复后重跑 `make check`，不放宽断言、不绕过覆盖率检查、不使用 `--no-verify` 等方式跳过本地钩子。
+- **CI 失败必复现**：CI/CD lint 失败时，禁止仅凭"本地通过"假设跳过排查；必须在本地复现 CI 同款命令确认通过后再提交修复。CI 等价命令（见 `.github/workflows/ci.yml`）：
+  - `uv run ruff check src tests`
+  - `uv run ruff format --check src tests`
+  - `uv run pyrefly check`
+  - `uv run pytest -m "not slow" --cov=fspack --cov-fail-under=95`
+- **门禁子命令清单**：
+  - `make lint`：`uv run ruff check .` + `uv run ruff format --check .`
+  - `make typecheck`：`uv run pyrefly check`
+  - `make cov`：`uv run pytest -m "not slow" --cov=fspack --cov-fail-under=95`
+  - `make check`：上述三项全跑（提交前用此命令）
+- **规则变更亦适用**：修改 `.trae/rules/` 下规则文件后，同样须跑 `make check` 确认未破坏既有门禁。
+- **执行记录**：收尾总结中须注明"已本地通过 `make check`"字样，便于追溯。
 
 ## 提交信息格式
 
