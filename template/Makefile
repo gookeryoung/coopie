@@ -4,7 +4,7 @@
 PACKAGE := {{ package_name }}
 COV_THRESHOLD := {{ coverage_fail_under }}
 
-.PHONY: help sync build b clean c test cov lint typecheck check{% if use_docs %} doc{% endif %}{% if use_tox %} tox{% endif %} bump patch minor major push
+.PHONY: help sync build b clean c test cov lint typecheck typecheck-ci check{% if use_docs %} doc{% endif %}{% if use_tox %} tox{% endif %} bump patch minor major push
 
 help: ## 显示帮助信息
 	@awk 'BEGIN {FS = ":.*##"} /^[a-zA-Z].*:.*##/ {printf "  \033[36m%-14s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -34,7 +34,10 @@ lint: ## 代码风格检查 (ruff)
 typecheck: ## 类型检查 (pyrefly)
 	uv run pyrefly check
 
-check: lint typecheck cov ## 运行全套门禁 (lint + typecheck + cov)
+typecheck-ci: ## 类型检查 (pyrefly, CI 平台 linux — 捕获跨平台问题)
+	uv run pyrefly check --python-platform linux
+
+check: lint typecheck typecheck-ci cov ## 运行全套门禁 (lint + typecheck + typecheck-ci + cov)
 {% if use_docs %}
 doc: ## 构建 Sphinx 文档
 	uv run sphinx-build -b html docs docs/_build/html

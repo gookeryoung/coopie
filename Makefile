@@ -1,7 +1,7 @@
 # Makefile - coopie 快捷命令
 # 运行 `make help` 查看所有可用命令
 
-.PHONY: help sync build b clean c lint typecheck check test cov doc render bump patch minor major push
+.PHONY: help sync build b clean c lint typecheck typecheck-ci check test cov doc render bump patch minor major push
 
 help: ## 显示帮助信息
 	@awk 'BEGIN {FS = ":.*##"} /^[a-zA-Z].*:.*##/ {printf "  \033[36m%-14s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -25,7 +25,10 @@ lint: ## 代码风格检查 (ruff)
 typecheck: ## 类型检查 (pyrefly)
 	uv run pyrefly check
 
-check: lint typecheck ## 运行全套门禁 (lint + typecheck)
+typecheck-ci: ## 类型检查 (pyrefly, CI 平台 linux — 捕获跨平台问题)
+	uv run pyrefly check --python-platform linux
+
+check: lint typecheck typecheck-ci cov ## 运行全套门禁 (lint + typecheck + typecheck-ci + cov)
 
 test: ## 运行测试
 	uv run pytest
