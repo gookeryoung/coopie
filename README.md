@@ -3,7 +3,7 @@
 > 基于 [copier](https://copier.readthedocs.io/) 的通用 Python 项目模板，通过 `coopie` CLI 或 `copier copy` 一键生成开箱即用的工程骨架。
 
 [![CI](https://github.com/gookeryoung/coopie/actions/workflows/ci.yml/badge.svg)](https://github.com/gookeryoung/coopie/actions/workflows/ci.yml)
-![Python](https://img.shields.io/badge/python-3.9%2B-blue.svg)
+![Python](https://img.shields.io/badge/python-3.8%2B-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 
 ## 简介
@@ -23,7 +23,7 @@ coopie 是一个 [copier](https://copier.readthedocs.io/) 模板仓库，用于�
 
 ### 前置要求
 
-- Python ≥ 3.9
+- Python ≥ 3.8
 - [uv](https://docs.astral.sh/uv/) ≥ 0.5（推荐）
 
 ### 使用 coopie CLI（推荐）

@@ -4,7 +4,7 @@
 前置要求
 --------
 
-- Python ≥ 3.9
+- Python ≥ 3.8
 - uv_ ≥ 0.5（推荐）
 
 .. _uv: https://docs.astral.sh/uv/
