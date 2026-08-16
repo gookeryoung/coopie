@@ -14,7 +14,6 @@ classifiers = [
 
 dependencies    = [
     "copier>=9.0.0",
-    "jinja2-time>=0.2.0",
     # prompt-toolkit 3.0.52 改变了 PromptSession 默认布局结构，questionary 2.1.0 的
     # _fix_unecessary_blank_lines 访问 VSplit.content（已不存在）导致 AttributeError。
     # 等待 questionary 上游修复后可移除此上限。

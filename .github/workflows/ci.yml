@@ -74,7 +74,7 @@ jobs:
       - name: Render template
         run: |
           mkdir -p .preview
-          uvx --with jinja2-time copier copy --trust --defaults --vcs-ref HEAD . .preview/out --data project_type=${{ matrix.project-type }}
+          uvx copier copy --trust --defaults --vcs-ref HEAD . .preview/out --data project_type=${{ matrix.project-type }}
 
       - name: Verify rendered structure
         run: |
