@@ -10,7 +10,6 @@ _message_before_copy: |
   - pre-commit 钩子
   - GitHub Actions CI/CD
   - Sphinx 文档 (ReadTheDocs)
-  - .trae 开发规则
   - src layout 项目结构
 
 _message_after_copy: |

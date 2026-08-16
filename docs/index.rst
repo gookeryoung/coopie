@@ -27,7 +27,6 @@ coopie 是一个 copier 模板仓库，用于生成符合现代 Python 工程实
 - **多版本测试**：tox + tox-uv
 - **项目类型**：library / cli / gui（PySide2/PySide6）/ web（FastAPI）
 - **项目结构**：src layout + py.typed 类型标记
-- **开发规则**：内嵌 ``.trae/rules/`` 与 ``.trae/skills/`` 规则体系，配套 SKILL 文档
 
 安装
 ====
@@ -75,7 +74,7 @@ coopie CLI 封装 copier 调用，安装后自动包含 copier 依赖：
    coopie update
 
    # 或使用 copier 原生命令
-   uvx copier update --trust --with jinja2-time
+   uvx copier update --trust
 
 ``coopie update`` 调用 ``copier recopy``，基于 ``.copier-answers.yml`` 中记录的答案重新渲染模板。
 

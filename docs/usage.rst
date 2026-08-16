@@ -55,7 +55,7 @@ coopie 提供 ``coopie`` CLI 封装 copier 命令，安装后自动包含 copier
 
 常用选项：
 
-- ``--trust``：允许模板中的 Jinja 扩展（如 ``jinja2-time``）执行。
+- ``--trust``：信任模板仓库以执行渲染。
 - ``--defaults``：使用所有参数的默认值，跳过交互（适用于 CI/脚本化场景）。
 - ``--vcs-ref v0.8.0``：指定模板版本（默认使用最新 tag）。
 - ``--data project_name=foo``：在命令行预设参数值。
@@ -82,7 +82,7 @@ coopie 提供 ``coopie`` CLI 封装 copier 命令，安装后自动包含 copier
    coopie update
 
    # 或使用 copier 原生命令
-   uvx copier update --trust --with jinja2-time
+   uvx copier update --trust
 
 ``coopie update`` 调用 ``copier recopy``，基于 ``.copier-answers.yml`` 中记录的答案重新渲染模板。copier 原生 ``update`` 命令则比对当前模板版本与记录版本，交互式应用差异更新。
 

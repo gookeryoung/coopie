@@ -18,7 +18,6 @@ coopie 是一个 [copier](https://copier.readthedocs.io/) 模板仓库，用于�
 - **多版本测试**：tox + tox-uv
 - **项目类型**：library / cli / gui（PySide2/PySide6）/ web（FastAPI）
 - **项目结构**：src layout + py.typed 类型标记
-- **开发规则**：内嵌 `.trae/rules/` 与 `.trae/skills/` 规则体系，配套 SKILL 文档
 
 ## 使用方式
 
@@ -61,7 +60,7 @@ uvx copier copy --trust https://gitee.com/gooker_young/coopie.git my-project
 uvx copier copy --trust https://github.com/gookeryoung/coopie.git my-project
 ```
 
-> `--trust` 用于允许模板中的 Jinja 扩展（如 `jinja2-time`）执行。如需指定模板版本，附加 `--vcs-ref v0.8.0`。
+> `--trust` 用于信任模板仓库以执行渲染。如需指定模板版本，附加 `--vcs-ref v0.8.0`。
 
 执行后 copier 会交互式询问项目名称、包名、Python 版本范围、项目类型（library/cli/gui/web）等参数，并在 `my-project/` 目录生成完整工程骨架。
 
@@ -94,7 +93,7 @@ uvx copier copy --trust https://github.com/gookeryoung/coopie.git my-project
 coopie update
 
 # 或使用 copier 原生命令
-uvx copier update --trust --with jinja2-time
+uvx copier update --trust
 ```
 
 `coopie update` 调用 `copier recopy`，基于 `.copier-answers.yml` 中记录的答案重新渲染模板。
@@ -147,8 +146,6 @@ coopie/
 ├── template/               # 模板内容（Jinja 渲染源，所有文件均参与渲染）
 │   ├── src/{{ package_name }}/
 │   ├── tests/
-│   ├── .trae/rules/        # 开发流程规则（随模板分发）
-│   ├── .trae/skills/       # SKILL 文档（类设计/并发/IO/测试/CLI/日志/配置/子进程/GUI）
 │   ├── pyproject.toml      # 模板内的 pyproject.toml（含 Jinja 表达式）
 │   ├── README.md           # 模板内的 README（含 Jinja 表达式）
 │   └── ...
@@ -158,7 +155,6 @@ coopie/
 │   └── py.typed
 ├── tests/                  # coopie CLI 测试
 ├── docs/                   # 本仓库的 Sphinx 文档
-├── .trae/                  # 本仓库的开发规则与迭代记录
 └── pyproject.toml          # 本仓库元数据与工具配置
 ```
 
