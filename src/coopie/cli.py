@@ -51,7 +51,7 @@ def init(
     defaults: bool = typer.Option(False, "--defaults", help="使用默认参数，跳过交互式询问"),
 ) -> None:
     """从模板创建新项目（调用 copier copy）."""
-    cmd: list[str] = ["copier", "copy", "--trust", url, destination]
+    cmd: list[str] = ["uvx", "copier", "copy", "--trust", url, destination]
     if vcs_ref:
         cmd += ["--vcs-ref", vcs_ref]
     if defaults:
@@ -76,7 +76,7 @@ def update(
             err=True,
         )
         raise typer.Exit(1)
-    cmd: list[str] = ["copier", "recopy", "--trust", str(dst)]
+    cmd: list[str] = ["uvx", "copier", "recopy", "--trust", str(dst)]
     if vcs_ref:
         cmd += ["--vcs-ref", vcs_ref]
     if defaults:
