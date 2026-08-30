@@ -97,7 +97,7 @@ def _run_copier(cmd: list[str]) -> None:
         subprocess.run(cmd, check=True, env=env)
     except FileNotFoundError as exc:
         typer.secho(
-            "错误：未找到 copier 命令，请确认 copier 已安装（pip install copier）",
+            "错误：未找到 uvx 命令，无法调用 uvx copier，请先安装 uv（pip install uv）",
             fg="red",
             err=True,
         )

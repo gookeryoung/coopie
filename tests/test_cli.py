@@ -30,7 +30,7 @@ def test_no_args_shows_help() -> None:
 
 
 def test_init_calls_copier_copy(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
-    """init 命令应调用 copier copy --trust."""
+    """init 命令应调用 uvx copier copy --trust."""
     calls: list[list[str]] = []
 
     def fake_run(cmd: list[str], **kwargs: Any) -> subprocess.CompletedProcess[str]:
@@ -44,7 +44,7 @@ def test_init_calls_copier_copy(monkeypatch: pytest.MonkeyPatch, tmp_path: Path)
 
     assert result.exit_code == 0
     assert len(calls) == 1
-    assert calls[0][:4] == ["copier", "copy", "--trust", DEFAULT_URL]
+    assert calls[0][:5] == ["uvx", "copier", "copy", "--trust", DEFAULT_URL]
     assert calls[0][-1] == dest
 
 
@@ -63,7 +63,7 @@ def test_init_with_custom_url(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -
     result = runner.invoke(app, ["init", dest, "--url", custom_url])
 
     assert result.exit_code == 0
-    assert calls[0][3] == custom_url
+    assert calls[0][4] == custom_url
 
 
 def test_init_with_vcs_ref(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
@@ -102,7 +102,7 @@ def test_init_with_defaults_flag(monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 
 
 def test_init_copier_not_found(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
-    """copier 不存在时应报错并退出 1."""
+    """uvx 不存在时应报错并退出 1."""
 
     def fake_run(cmd: list[str], **kwargs: Any) -> subprocess.CompletedProcess[str]:
         raise FileNotFoundError(cmd[0])
@@ -148,7 +148,7 @@ def test_update_calls_copier_recopy(monkeypatch: pytest.MonkeyPatch, tmp_path: P
 
     assert result.exit_code == 0
     assert len(calls) == 1
-    assert calls[0][:3] == ["copier", "recopy", "--trust"]
+    assert calls[0][:4] == ["uvx", "copier", "recopy", "--trust"]
 
 
 def test_update_without_answers_file(tmp_path: Path) -> None:
@@ -179,7 +179,7 @@ def test_update_defaults_to_current_dir(monkeypatch: pytest.MonkeyPatch, tmp_pat
 
     assert result.exit_code == 0
     assert len(calls) == 1
-    assert calls[0][:3] == ["copier", "recopy", "--trust"]
+    assert calls[0][:4] == ["uvx", "copier", "recopy", "--trust"]
 
 
 def test_update_with_vcs_ref(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
