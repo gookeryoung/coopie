@@ -25,7 +25,7 @@ license         = "MIT"
 name            = "coopie"
 readme          = "README.md"
 requires-python = ">=3.8"
-version         = "0.9.2"
+version         = "0.9.3"
 
 [project.scripts]
 coopie = "coopie.cli:main"
