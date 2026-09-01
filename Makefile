@@ -34,7 +34,7 @@ test: ## 运行测试
 	uv run pytest
 
 cov: ## 运行测试并生成 HTML 覆盖率报告
-	uv run pytest --cov --cov-report=html
+	uv run pytest --cov --cov-report=html -n auto
 	@echo "覆盖率报告：htmlcov/index.html"
 
 doc: ## 构建 Sphinx 文档
