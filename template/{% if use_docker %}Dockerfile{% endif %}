@@ -50,15 +50,12 @@ RUN uv python install {{ min_python_version }} {{ max_python_version }}
 
 # 预装项目 dev 依赖（仅复制依赖描述文件，利用 Docker 层缓存）
 WORKDIR /workspace
-COPY pyproject.toml uv.toml{% if use_tox %} tox.ini{% endif %} README.md ./
+COPY pyproject.toml{% if use_tox %} tox.ini{% endif %} README.md ./
 COPY src/ ./src/
 
 # 同步依赖到 /opt/venv（CI 时直接复用）
 RUN uv sync --frozen --no-install-project 2>/dev/null || uv sync --no-install-project
-{% if use_tox %}
-# 预装 tox 环境（首尾两个版本）
-RUN uvx tox run -e {{ tox_envlist.split(', ')[0] }},{{ tox_envlist.split(', ')[-1] }} --notest 2>/dev/null || true
-{% endif %}
+
 # 持久化 uv 缓存目录（CI 可挂载到宿主机加速）
 VOLUME ["/uv-cache"]
 

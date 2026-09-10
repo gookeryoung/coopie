@@ -5,7 +5,7 @@ _message_before_copy: |
   === Python 项目模板 ===
   基于 copier 的通用 Python 项目模板，一键生成开箱即用的工程骨架。包含:
   - pyproject.toml (项目元数据 + hatchling 构建)
-  - 独立工具链配置 (ruff.toml / pytest.ini / .coveragerc / pyrefly.toml / .bumpversion.toml / uv.toml)
+  - 独立工具链配置 (ruff.toml / pytest.ini / .coveragerc / pyrefly.toml / .bumpversion.toml)
   - tox 多版本测试配置
   - pre-commit 钩子
   - GitHub Actions CI/CD
@@ -184,7 +184,6 @@ _templates_suffix: ""
 _copy_without_render:
   - "src/*/py.typed"
   - "docs/_static/.gitkeep"
-  - "tests/__init__.py"
 # copier update 时跳过已存在的文件（项目自身配置，由用户管理）
 # 这些文件首次 copy 时正常生成，update 时若已存在则不覆盖
 _skip_if_exists:
