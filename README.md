@@ -1,6 +1,6 @@
 # coopie
 
-> 基于 [copier](https://copier.readthedocs.io/) 的通用 Python 项目模板，通过 `coopie` CLI 或 `copier copy` 一键生成开箱即用的工程骨架。
+> 基于 copier 的通用 Python 项目模板。
 
 [![CI](https://github.com/gookeryoung/coopie/actions/workflows/ci.yml/badge.svg)](https://github.com/gookeryoung/coopie/actions/workflows/ci.yml)
 ![Python](https://img.shields.io/badge/python-3.8%2B-blue.svg)
