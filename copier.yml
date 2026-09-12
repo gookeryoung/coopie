@@ -191,5 +191,6 @@ _skip_if_exists:
   - ".python-version"
   - "README.md"
   - "LICENSE"
+  - "docs/**/*"
   - "src/*/__init__.py"
   - "src/{{ package_name }}/*.py"
