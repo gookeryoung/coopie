@@ -14,7 +14,7 @@ from __future__ import annotations
 
 import os
 from pathlib import Path
-from typing import Optional
+from typing import Any, Optional
 
 # Windows 下 copier 读 yaml 时若遇到非 ASCII 内容会因 GBK 区域触发
 # UnicodeDecodeError。PEP 540 UTF-8 模式在进程启动前设置才生效，这里
@@ -38,8 +38,19 @@ DEFAULT_URL = "https://gitee.com/gooker_young/coopie.git"
 # 无法识别 Gitee、Codeup 等国内代码托管平台的 HTTPS URL。这里在 import
 # copier 后立即扩展 GIT_PREFIX，并追加 gt: 简写到 REPLACEMENTS。
 def _patch_copier_vcs() -> None:
-    """扩展 copier._vcs 支持 Gitee / Codeup 等国内平台."""
-    from copier import _vcs
+    """扩展 copier 的 VCS 模块支持 Gitee / Codeup 等国内平台.
+
+    copier 在不同环境下 VCS 模块命名不同：
+    - Python 3.8 + copier 9.3.x: ``copier.vcs`` （无前缀）
+    - Python >=3.10 + copier 9.17+: ``copier._vcs`` （有前缀）
+    用 importlib 动态导入先试 ``_vcs``，不行 fallback 到 ``vcs``。
+    """
+    import importlib
+
+    try:
+        vcs_mod = importlib.import_module("copier._vcs")
+    except ImportError:
+        vcs_mod = importlib.import_module("copier.vcs")
 
     extra = (
         "https://gitee.com/",
@@ -47,14 +58,14 @@ def _patch_copier_vcs() -> None:
         "https://gitlab.cn/",
         "https://gitee.cn/",
     )
-    merged = tuple(dict.fromkeys((*_vcs.GIT_PREFIX, *extra)))
-    _vcs.GIT_PREFIX = merged  # pyrefly: ignore [bad-assignment]
+    merged = tuple(dict.fromkeys((*vcs_mod.GIT_PREFIX, *extra)))
+    vcs_mod.GIT_PREFIX = merged  # pyrefly: ignore [missing-attribute]
 
     # copier 9.17+ 已硬编码 gh:/gl:，直接追加 gt: → Gitee
-    _vcs.REPLACEMENTS = [  # pyrefly: ignore [bad-assignment]
-        *_vcs.REPLACEMENTS,
-        (_vcs.re.compile(r"^gt:/?(.*\.git)$"), r"https://gitee.com/\1"),
-        (_vcs.re.compile(r"^gt:/?(.*)$"), r"https://gitee.com/\1.git"),
+    vcs_mod.REPLACEMENTS = [  # pyrefly: ignore [missing-attribute]
+        *vcs_mod.REPLACEMENTS,
+        (vcs_mod.re.compile(r"^gt:/?(.*\.git)$"), r"https://gitee.com/\1"),
+        (vcs_mod.re.compile(r"^gt:/?(.*)$"), r"https://gitee.com/\1.git"),
     ]
 
 
@@ -151,13 +162,18 @@ def init(
     dst = Path(destination).resolve()
     template_url = _normalize_url(url)
     typer.echo(f"正在从 {template_url} 创建项目到 {dst} ...")
-    copier.run_copy(
-        src_path=template_url,
-        dst_path=dst,
-        vcs_ref=vcs_ref,
-        defaults=defaults,
-        settings=copier.Settings(trust=[template_url]),
-    )
+
+    kwargs: dict[str, Any] = {
+        "src_path": template_url,
+        "dst_path": dst,
+        "vcs_ref": vcs_ref,
+        "defaults": defaults,
+    }
+    # copier 9.17+ 引入了 Settings/trust；老版本不传此参数
+    if hasattr(copier, "Settings"):
+        kwargs["settings"] = copier.Settings(trust=[template_url])
+
+    copier.run_copy(**kwargs)
 
 
 @app.command()
@@ -186,13 +202,18 @@ def update(
     src_path = _read_answers_src_path(answers_file)
 
     typer.echo(f"正在更新项目 {dst} ...")
+
+    kwargs: dict[str, Any] = {
+        "dst_path": dst,
+        "vcs_ref": vcs_ref,
+        "defaults": defaults,
+    }
+    # copier 9.17+ 引入了 Settings/trust；老版本不传此参数
+    if hasattr(copier, "Settings") and src_path:
+        kwargs["settings"] = copier.Settings(trust=[src_path])
+
     try:
-        copier.run_recopy(
-            dst_path=dst,
-            vcs_ref=vcs_ref,
-            defaults=defaults,
-            settings=copier.Settings(trust=[src_path]) if src_path else None,
-        )
+        copier.run_recopy(**kwargs)
     except copier.errors.UserMessageError as exc:
         typer.secho(f"错误：{exc}", fg="red", err=True)
         raise typer.Exit(1) from exc

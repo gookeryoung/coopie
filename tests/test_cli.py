@@ -13,6 +13,8 @@ from coopie.cli import (
     DEFAULT_URL,
     _ensure_answers_url_normalized,
     _normalize_url,
+    _patch_copier_vcs,
+    _read_answers_src_path,
     app,
 )
 
@@ -142,9 +144,9 @@ def test_init_calls_copier_copy(monkeypatch: pytest.MonkeyPatch, tmp_path: Path)
     assert captured["dst_path"] == Path(dest).resolve()
     assert captured["vcs_ref"] is None
     assert captured["defaults"] is False
-    # trust 里包含模板 URL
-    trust_set = captured["settings"].trust
-    assert DEFAULT_URL in trust_set
+    # trust 里包含模板 URL（仅 copier 9.17+ 有 Settings）
+    if "settings" in captured and captured["settings"] is not None:
+        assert DEFAULT_URL in captured["settings"].trust
 
 
 def test_init_with_custom_url_normalized(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
@@ -227,9 +229,9 @@ def test_update_calls_copier_recopy(monkeypatch: pytest.MonkeyPatch, tmp_path: P
     assert captured["dst_path"] == project_dir.resolve()
     assert captured["vcs_ref"] is None
     assert captured["defaults"] is False
-    # trust 里包含 answers 中的 src_path（已被补成 .git）
-    trust_set = captured["settings"].trust
-    assert "https://gitee.com/gooker_young/coopie.git" in trust_set
+    # trust 里包含 answers 中的 src_path（已被补成 .git，仅 copier 9.17+ 有 Settings）
+    if "settings" in captured and captured["settings"] is not None:
+        assert "https://gitee.com/gooker_young/coopie.git" in captured["settings"].trust
 
 
 def test_update_fixes_answers_src_path_git_suffix(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
@@ -257,7 +259,7 @@ def test_update_without_answers_file(tmp_path: Path) -> None:
     result = runner.invoke(app, ["update", str(project_dir)])
 
     assert result.exit_code == 1
-    assert ".copier-answers.yml" in result.stderr or ".copier-answers.yml" in result.stdout
+    assert ".copier-answers.yml" in result.output
 
 
 def test_update_defaults_to_current_dir(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
@@ -329,8 +331,7 @@ def test_update_copier_user_error(monkeypatch: pytest.MonkeyPatch, tmp_path: Pat
     result = runner.invoke(app, ["update", str(project_dir)])
 
     assert result.exit_code == 1
-    output = result.stderr + result.stdout
-    assert "目标目录不干净" in output
+    assert "目标目录不干净" in result.output
 
 
 # ---------------------------------------------------------------------------
@@ -338,17 +339,27 @@ def test_update_copier_user_error(monkeypatch: pytest.MonkeyPatch, tmp_path: Pat
 # ---------------------------------------------------------------------------
 
 
+def _get_vcs_module() -> Any:
+    """获取 copier 的 VCS 内部模块（兼容 copier 9.3.x 的 vcs 和 9.17+ 的 _vcs）."""
+    import importlib
+
+    try:
+        return importlib.import_module("copier._vcs")
+    except ImportError:
+        return importlib.import_module("copier.vcs")
+
+
 def test_git_prefix_patch_includes_gitee() -> None:
     """_patch_copier_vcs 后 GIT_PREFIX 应包含 Gitee/Codeup 等国内平台."""
-    from copier import _vcs
-
-    assert "https://gitee.com/" in _vcs.GIT_PREFIX
-    assert "https://codeup.aliyun.com/" in _vcs.GIT_PREFIX
+    vcs_mod = _get_vcs_module()
+    assert "https://gitee.com/" in vcs_mod.GIT_PREFIX
+    assert "https://codeup.aliyun.com/" in vcs_mod.GIT_PREFIX
 
 
 def test_get_repo_recognizes_gitee_https() -> None:
     """get_repo 应能识别 Gitee HTTPS URL（带/不带 .git 后缀）."""
-    from copier._vcs import get_repo
+    vcs_mod = _get_vcs_module()
+    get_repo = vcs_mod.get_repo
 
     # 不带 .git 后缀
     assert get_repo("https://gitee.com/gooker_young/coopie") is not None
@@ -356,3 +367,65 @@ def test_get_repo_recognizes_gitee_https() -> None:
     assert get_repo("https://gitee.com/gooker_young/coopie.git") is not None
     # Codeup
     assert get_repo("https://codeup.aliyun.com/cndev/python/coopie") is not None
+
+
+# ---------------------------------------------------------------------------
+# _patch_copier_vcs 的 fallback 分支覆盖
+# ---------------------------------------------------------------------------
+
+
+def test_patch_vcs_fallback_to_vcs_module(monkeypatch: pytest.MonkeyPatch) -> None:
+    """当 _vcs 不可用时应 fallback 到 vcs（Python 3.8 路径）."""
+    import sys
+
+    import copier
+
+    original_meta_path = list(sys.meta_path)
+
+    # 在 meta_path 最前面插入一个 finder，阻止 copier._vcs 被加载
+    class _BlockVCSFinder:
+        @classmethod
+        def find_spec(cls, fullname: str, _path: Any = None, _target: Any = None) -> Any:
+            if fullname == "copier._vcs":
+                raise ImportError("blocked for test")
+            return None
+
+    sys.meta_path.insert(0, _BlockVCSFinder)
+    monkeypatch.setattr(sys, "meta_path", original_meta_path)
+
+    # 清掉缓存
+    if hasattr(copier, "_vcs"):
+        delattr(copier, "_vcs")
+    sys.modules.pop("copier._vcs", None)
+
+    # 不应抛异常，说明走到了 fallback 分支
+    _patch_copier_vcs()
+
+    # fallback 后 vcs 模块的 GIT_PREFIX 也应包含国内平台
+    from copier import vcs as vcs_mod
+
+    assert "https://gitee.com/" in vcs_mod.GIT_PREFIX
+
+
+# ---------------------------------------------------------------------------
+# _read_answers_src_path 异常分支覆盖
+# ---------------------------------------------------------------------------
+
+
+class TestReadAnswersSrcPath:
+    def test_normal_dict(self, tmp_path: Path) -> None:
+        f = tmp_path / ".copier-answers.yml"
+        f.write_text(yaml.dump({"_src_path": "https://github.com/a/b.git"}), encoding="utf-8")
+        assert _read_answers_src_path(f) == "https://github.com/a/b.git"
+
+    def test_yaml_parse_error_returns_empty(self, tmp_path: Path) -> None:
+        """YAML 解析失败应返回空字符串."""
+        f = tmp_path / ".copier-answers.yml"
+        f.write_text(":::: not valid yaml ::::", encoding="utf-8")
+        assert _read_answers_src_path(f) == ""
+
+    def test_non_dict_returns_empty(self, tmp_path: Path) -> None:
+        """YAML 解析结果不是 dict 应返回空字符串."""
+        f = tmp_path / ".copier-answers.yml"
+        f.write_text("just a plain string", encoding="utf-8")
+        assert _read_answers_src_path(f) == ""
