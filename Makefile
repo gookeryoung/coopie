@@ -1,5 +1,7 @@
 # Makefile - coopie 快捷命令
 # 运行 `make help` 查看所有可用命令
+COV_THRESHOLD := 95
+PYTEST_JOBS := 8  # pytest-xdist 并行进程数；Windows 默认 8 避免句柄耗尽
 
 .PHONY: help sync build b clean c lint typecheck typecheck-ci check test cov doc render bump patch minor major push
 
@@ -31,11 +33,11 @@ typecheck-ci: ## 类型检查 (pyrefly, CI 平台 linux — 捕获跨平台问�
 check: lint typecheck typecheck-ci cov ## 运行全套门禁 (lint + typecheck + typecheck-ci + cov)
 
 test: ## 运行测试
-	uv run pytest
+	uv run pytest -n $(PYTEST_JOBS)
 
 cov: ## 运行测试并生成 HTML 覆盖率报告
-	uv run pytest --cov --cov-report=html -n auto
-	@echo "覆盖率报告：htmlcov/index.html"
+	uv run pytest --cov --cov-report=term --cov-fail-under=$(COV_THRESHOLD) --cov-report=html -n $(PYTEST_JOBS)
+	@uv run python -c "print('Coverage report: htmlcov/index.html')"
 
 doc: ## 构建 Sphinx 文档
 	uv run sphinx-build -b html docs docs/_build/html
