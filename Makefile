@@ -1,9 +1,11 @@
-# Makefile - coopie 快捷命令
+# Makefile - coopie 项目快捷命令
 # 运行 `make help` 查看所有可用命令
+
+PACKAGE := coopie
 COV_THRESHOLD := 95
 PYTEST_JOBS := 8  # pytest-xdist 并行进程数；Windows 默认 8 避免句柄耗尽
 
-.PHONY: help sync build b clean c lint typecheck typecheck-ci check test cov doc render bump patch minor major push
+.PHONY: help sync build b clean c test cov lint typecheck typecheck-ci check doc pub bump patch minor major push
 
 help: ## 显示帮助信息
 	@uv run python -c "import re,sys;ms=[(m.group(1),m.group(2).strip()) for f in sys.argv[1:] for l in open(f,encoding='utf-8') if (m:=re.match(r'^([a-zA-Z][\w -]*):.*?##\s*(.*)',l))];[print(f'  {n:<14} {d}') for n,d in ms]" $(MAKEFILE_LIST)
@@ -11,7 +13,7 @@ help: ## 显示帮助信息
 sync: ## 安装开发依赖
 	uv sync --extra dev
 
-build b: ## 构建 Python 包
+build b: ## 构建分发包 (wheel + sdist)
 	uv build
 
 clean c: ## 清理构建产物与缓存
@@ -62,5 +64,9 @@ bump: ## 版本号 bump (默认 patch，用法: make bump [minor|major])
 patch minor major:
 	@:
 
+pub:  ## 推送到pypi
+	uvx twine upload ./dist/**
+
 push: ## 推送代码到所有远程仓库
 	@uv run python -c "import subprocess as sp; [print(f'\u63a8\u9001 {r}...',flush=True) or (sp.run(['git','push',r],check=True) and sp.run(['git','push',r,'--tags'],check=True)) for r in sp.check_output(['git','remote'],text=True).split()]"
+
