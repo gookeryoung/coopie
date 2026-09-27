@@ -11,7 +11,7 @@
 ## 特性
 
 - **构建工具链**：hatchling + uv + ruff + pyrefly + pytest + coverage
-- **Python 版本**：{{ min_python_version }} ~ {{ max_python_version }}
+- **Python 版本**：{% if min_python_version == max_python_version %}{{ min_python_version }}{% else %}{{ min_python_version }} ~ {{ max_python_version }}{% endif %}
 - **代码质量**：pre-commit 钩子 + ruff lint/format，覆盖率阈值 {{ coverage_fail_under }}%
 {% if use_cicd %}- **CI/CD**：GitHub Actions（lint + typecheck + 多版本测试 + 自动发布到 PyPI）
 {% endif %}{% if use_docs %}- **文档**：Sphinx + ReadTheDocs（中文 zh_CN）

@@ -76,6 +76,11 @@ max_python_version:
     "3.12": "3.12"
     "3.13": "3.13"
     "3.14": "3.14"
+  # choices 与 all_versions 需同步维护；此处必须用数值比较，字符串比较 "3.8" > "3.14" 会误判
+  validator: |
+    {%- if min_python_version|replace('.', '')|int > max_python_version|replace('.', '')|int -%}
+    最高版本（{{ max_python_version }}）不能低于最低版本（{{ min_python_version }}）
+    {%- endif -%}
 
 # ============================================================
 # 计算变量（when: false 表示不询问，自动派生）
@@ -85,7 +90,7 @@ target_py:
   default: "py{{ min_python_version|replace('.', '') }}"
   when: false
 
-# 支持的 Python 版本列表（JSON 数组）
+# 支持的 Python 版本列表（JSON 数组；版本单一事实来源，tox/CI/分类器均由此派生）
 supported_py_versions:
   type: json
   default: >-
@@ -99,22 +104,14 @@ supported_py_versions:
 tox_envlist:
   type: str
   default: >-
-    {%- set all_versions = ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "3.14"] -%}
-    {%- set start = all_versions.index(min_python_version) -%}
-    {%- set end = all_versions.index(max_python_version) + 1 -%}
-    {%- set versions = all_versions[start:end] -%}
-    {%- for v in versions -%}py{{ v|replace('.', '') }}{% if not loop.last %}, {% endif %}{%- endfor -%}
+    {%- for v in supported_py_versions -%}py{{ v|replace('.', '') }}{% if not loop.last %}, {% endif %}{%- endfor -%}
   when: false
 
-# CI 矩阵中测试的 Python 版本（首尾两个）
+# CI 矩阵中测试的 Python 版本（首尾两个；min==max 时 unique 去重为单版本）
 ci_test_versions:
   type: json
   default: >-
-    {%- set all_versions = ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "3.14"] -%}
-    {%- set start = all_versions.index(min_python_version) -%}
-    {%- set end = all_versions.index(max_python_version) + 1 -%}
-    {%- set versions = all_versions[start:end] -%}
-    {{- [versions[0], versions[-1]] | tojson -}}
+    {{- [supported_py_versions|first, supported_py_versions|last]|unique|list|tojson -}}
   when: false
 
 # ============================================================

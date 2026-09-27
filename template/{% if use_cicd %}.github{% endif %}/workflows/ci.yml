@@ -37,7 +37,7 @@ jobs:
         run: uv run pyrefly check
 
   test:
-    name: Test (Python {{ ci_test_versions[0] }} & {{ ci_test_versions[-1] }})
+    name: Test (Python {{ ci_test_versions|join(' & ') }})
     runs-on: ubuntu-latest
     timeout-minutes: 15
     strategy:

@@ -45,8 +45,8 @@ RUN pip install --no-cache-dir uv -i https://mirrors.aliyun.com/pypi/simple/
 # 安装 uv
 RUN pip install --no-cache-dir uv
 {% endif %}
-# 预装项目所需 Python 版本
-RUN uv python install {{ min_python_version }} {{ max_python_version }}
+# 预装项目所需 Python 版本（min==max 时只装一次）
+RUN uv python install {{ min_python_version }}{% if min_python_version != max_python_version %} {{ max_python_version }}{% endif %}
 
 # 预装项目 dev 依赖（仅复制依赖描述文件，利用 Docker 层缓存）
 WORKDIR /workspace
