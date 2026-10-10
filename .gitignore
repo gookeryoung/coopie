@@ -21,6 +21,7 @@ coverage.xml
 .pyrefly_cache/
 .mypy_cache/
 .uv-cache/
+.pnpm-store/
 
 # IDE
 .idea/
