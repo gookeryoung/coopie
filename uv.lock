@@ -1,5 +1,4 @@
 version = 1
-revision = 2
 requires-python = ">=3.8"
 resolution-markers = [
     "python_full_version >= '3.12'",
@@ -194,7 +193,7 @@ name = "click"
 version = "8.1.8"
 source = { registry = "https://mirrors.cloud.tencent.com/pypi/simple/" }
 dependencies = [
-    { name = "colorama", marker = "python_full_version < '3.10' and sys_platform == 'win32'" },
+    { name = "colorama", marker = "python_full_version < '3.10' and platform_system == 'Windows'" },
 ]
 sdist = { url = "https://mirrors.cloud.tencent.com/pypi/packages/b9/2e/0090cbf739cee7d23781ad4b89a9894a41538e4fcf4c31dcdd705b78eb8b/click-8.1.8.tar.gz", hash = "sha256:ed53c9d8990d83c2a27deae68e4ee337473f6330c040a31d4225c9574d16096a" }
 wheels = [
@@ -212,7 +211,7 @@ wheels = [
 
 [[package]]
 name = "coopie"
-version = "1.0.5"
+version = "1.0.6"
 source = { editable = "." }
 dependencies = [
     { name = "copier", version = "9.3.1", source = { registry = "https://mirrors.cloud.tencent.com/pypi/simple/" }, marker = "python_full_version < '3.9'" },
@@ -292,7 +291,6 @@ requires-dist = [
     { name = "sphinx-rtd-theme", marker = "extra == 'docs'", specifier = ">=2.0" },
     { name = "typer", specifier = ">=0.20.0" },
 ]
-provides-extras = ["dev", "docs", "lint", "test"]
 
 [package.metadata.requires-dev]
 dev = [
@@ -1342,7 +1340,7 @@ resolution-markers = [
 ]
 dependencies = [
     { name = "importlib-resources", marker = "python_full_version < '3.9'" },
-    { name = "pywin32", marker = "python_full_version < '3.9' and platform_python_implementation != 'PyPy' and sys_platform == 'win32'" },
+    { name = "pywin32", marker = "python_full_version < '3.9' and platform_python_implementation != 'PyPy' and platform_system == 'Windows'" },
 ]
 sdist = { url = "https://mirrors.cloud.tencent.com/pypi/packages/f0/5d/49ba324ad4ae5b1a4caefafbce7a1648540129344481f2ed4ef6bb68d451/plumbum-1.9.0.tar.gz", hash = "sha256:e640062b72642c3873bd5bdc3effed75ba4d3c70ef6b6a7b907357a84d909219" }
 wheels = [
@@ -2618,7 +2616,7 @@ resolution-markers = [
 ]
 dependencies = [
     { name = "annotated-doc", marker = "python_full_version >= '3.10'" },
-    { name = "colorama", marker = "python_full_version >= '3.10' and sys_platform == 'win32'" },
+    { name = "colorama", marker = "python_full_version >= '3.10' and platform_system == 'Windows'" },
     { name = "rich", version = "15.0.0", source = { registry = "https://mirrors.cloud.tencent.com/pypi/simple/" }, marker = "python_full_version >= '3.10'" },
     { name = "shellingham", marker = "python_full_version >= '3.10'" },
 ]
