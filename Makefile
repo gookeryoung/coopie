@@ -60,6 +60,9 @@ BUMP_PART := $(filter-out bump,$(MAKECMDGOALS))
 
 bump: ## 版本号 bump (默认 patch，用法: make bump [minor|major])
 	@uvx bump-my-version bump $(if $(BUMP_PART),$(firstword $(BUMP_PART)),patch) --tag
+	uv sync --extra dev
+	git add uv.lock
+	-git diff --cached --quiet || git commit -m "chore: 同步 uv.lock"
 
 patch minor major:
 	@:
