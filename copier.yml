@@ -162,7 +162,7 @@ project_type:
 
 use_domestic_mirrors:
   type: bool
-  help: 是否预置国内镜像源（pip/uv 清华源、apt 阿里云）
+  help: 是否预置国内镜像源（pip/uv 华为云源、apt 华为云）
   default: true
 
 coverage_fail_under:

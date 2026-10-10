@@ -79,7 +79,7 @@ uvx copier copy --trust https://github.com/gookeryoung/coopie.git my-project
 | `use_docker` | bool | `false` | 是否包含 Dockerfile |
 | `use_cicd` | bool | `true` | 是否包含 GitHub Actions CI/CD |
 | `use_tox` | bool | `true` | 是否包含 tox 多版本测试 |
-| `use_domestic_mirrors` | bool | `true` | 是否预置国内镜像源（pip/uv 清华源、apt 阿里云） |
+| `use_domestic_mirrors` | bool | `true` | 是否预置国内镜像源（pip/uv 华为云源、apt 华为云） |
 | `coverage_fail_under` | int | `95` | 覆盖率阈值（百分比） |
 
 完整参数说明见 [`copier.yml`](copier.yml)。

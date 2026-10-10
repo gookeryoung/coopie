@@ -48,7 +48,7 @@ build-backend = "hatchling.build"
 requires      = ["hatchling"]
 
 [[tool.uv.index]]
-url = "https://mirrors.aliyun.com/pypi/simple/"
+url = "https://repo.huaweicloud.com/repository/pypi/simple/"
 default = true
 
 [tool.hatch.build.targets.wheel]

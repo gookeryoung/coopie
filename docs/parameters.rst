@@ -98,7 +98,7 @@ Python 版本配置
 ``use_domestic_mirrors``
    类型：bool，默认：true
 
-   是否预置国内镜像源（uv 阿里云源、apt 阿里云源）。
+   是否预置国内镜像源（uv 华为云源、apt 华为云源）。
 
 ``coverage_fail_under``
    类型：int，默认：95

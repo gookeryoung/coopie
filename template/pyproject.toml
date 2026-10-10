@@ -48,7 +48,7 @@ packages = ["src/{{ package_name }}"]
 
 {% if use_domestic_mirrors %}[[tool.uv.index]]
 default = true
-url     = "https://mirrors.aliyun.com/pypi/simple/"
+url     = "https://repo.huaweicloud.com/repository/pypi/simple/"
 {% endif %}
 
 [dependency-groups]
