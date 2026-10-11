@@ -141,7 +141,7 @@ make lint      # ruff 检查
 make typecheck # pyrefly 类型检查
 make test      # 运行测试
 make cov       # 测试 + HTML 覆盖率报告
-make check     # 全套门禁 (lint + typecheck)
+make check     # 全套门禁 (lint + typecheck + typecheck-ci + cov)
 make doc       # 构建 Sphinx 文档
 make build     # 构建 Python 包
 make bump PART=patch  # 版本号 bump（创建 git tag，供 copier --vcs-ref 引用）
