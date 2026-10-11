@@ -36,6 +36,14 @@ coopie 提供 ``coopie`` CLI 封装 copier 命令，安装后自动包含 copier
    # 使用默认参数跳过交互（CI/脚本化场景）
    coopie init my-project --defaults
 
+   # 信任模板源，跳过 copier 的模板执行安全确认（仅用于可信模板）
+   coopie init my-project --trust
+
+.. note::
+
+   ``coopie`` 默认**不**自动 trust 模板源：模板含 Jinja/任务时 copier 会请求确认。
+   确认模板来源可信后再加 ``--trust``，避免静默执行第三方模板中的代码。
+
 使用 copier 原生命令（备选）
 -----------------------------
 
@@ -81,10 +89,15 @@ coopie 提供 ``coopie`` CLI 封装 copier 命令，安装后自动包含 copier
    # 使用 coopie CLI（推荐）
    coopie update
 
+   # 信任模板源时
+   coopie update --trust
+
    # 或使用 copier 原生命令
    uvx copier update --trust
 
 ``coopie update`` 调用 ``copier recopy``，基于 ``.copier-answers.yml`` 中记录的答案重新渲染模板。copier 原生 ``update`` 命令则比对当前模板版本与记录版本，交互式应用差异更新。
+
+模板源取自该文件里的 ``_src_path``，可能指向第三方仓库，因此 ``coopie update`` 默认不自动 trust——确认来源可信后再加 ``--trust``。
 
 项目类型说明
 ------------

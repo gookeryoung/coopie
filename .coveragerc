@@ -1,6 +1,8 @@
 [run]
 branch = true
-concurrency = thread
+# 测试用 pytest-xdist 多进程并行，concurrency 必须是 multiprocessing；
+# 设为 thread 会导致各 worker 的覆盖率无法正确合并（实测统计从 96% 掉到 74%）
+concurrency = multiprocessing
 omit = tests/*
 source = coopie
 

@@ -48,7 +48,13 @@ coopie init my-project --vcs-ref v0.8.0
 
 # 使用默认参数跳过交互（CI/脚本化场景）
 coopie init my-project --defaults
+
+# 信任模板源，跳过 copier 的模板执行安全确认（仅用于可信模板）
+coopie init my-project --trust
 ```
+
+> `coopie` 默认**不**自动 trust 模板源：模板含 Jinja/任务时 copier 会请求确认。
+> 确认模板来源可信后再加 `--trust`，避免静默执行第三方模板中的代码。
 
 ### 使用 copier 原生命令（备选）
 
@@ -92,11 +98,15 @@ uvx copier copy --trust https://github.com/gookeryoung/coopie.git my-project
 # 使用 coopie CLI（推荐）
 coopie update
 
+# 信任模板源时
+coopie update --trust
+
 # 或使用 copier 原生命令
 uvx copier update --trust
 ```
 
 `coopie update` 调用 `copier recopy`，基于 `.copier-answers.yml` 中记录的答案重新渲染模板。
+模板源来自该文件里的 `_src_path`，因此默认不自动 trust——确认来源可信后再加 `--trust`。
 
 ## 模板开发
 

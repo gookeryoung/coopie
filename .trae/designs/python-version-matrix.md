@@ -22,8 +22,8 @@
 
 ## 测试
 
-- `tests/test_template_render.py`：以 `copier.run_copy(vcs_ref="HEAD", defaults=True)` 渲染工作树模板，覆盖 min==max、min<max、min>max（validator 拒绝）三类场景，断言 CI 矩阵/job name、tox envlist、classifiers、Dockerfile、README 的派生结果。
-- 渲染必须传 `vcs_ref="HEAD"`：copier 对本地 git 模板默认检出最新 tag，会绕过未提交修改。
+- `tests/test_template_render.py`：覆盖 min==max、min<max、min>max（validator 拒绝）三类场景，断言 CI 矩阵/job name、tox envlist、classifiers、Dockerfile、README 的派生结果。
+- 渲染机制（快照 + 缓存）见 `test-infrastructure.md`。
 
 ## 维护约束
 

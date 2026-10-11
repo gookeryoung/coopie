@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [main, develop]
 
+# 最小权限：CI 只读代码，避免继承仓库默认的过宽权限
+permissions:
+  contents: read
+
 concurrency:
   group: {% raw %}${{ github.workflow }}-${{ github.ref }}{% endraw %}
   cancel-in-progress: true

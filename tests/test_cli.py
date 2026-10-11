@@ -11,14 +11,21 @@ from typer.testing import CliRunner
 
 from coopie.cli import (
     DEFAULT_URL,
-    _ensure_answers_url_normalized,
+    _ensure_copier_vcs_patched,
+    _load_answers,
     _normalize_url,
     _patch_copier_vcs,
-    _read_answers_src_path,
+    _resolve_answers_src_path,
     app,
 )
 
 runner = CliRunner()
+
+
+@pytest.fixture(autouse=True)
+def _patched_copier_vcs() -> None:
+    """copier VCS patch 已改为按需执行；测试里显式触发，保证断言环境一致."""
+    _ensure_copier_vcs_patched()
 
 
 def test_version_flag() -> None:
@@ -60,13 +67,17 @@ class TestNormalizeUrl:
         assert _normalize_url("./local/template") == "./local/template"
         assert _normalize_url("/tmp/tpl") == "/tmp/tpl"
 
+    def test_trailing_slash(self) -> None:
+        """结尾斜杠应先剥离，否则会生成 '.../.git' 这种无效 URL."""
+        assert _normalize_url("https://gitee.com/gooker_young/coopie/") == "https://gitee.com/gooker_young/coopie.git"
+
 
 # ---------------------------------------------------------------------------
 # _ensure_answers_url_normalized 单测
 # ---------------------------------------------------------------------------
 
 
-class TestEnsureAnswersUrl:
+class TestResolveAnswersSrcPath:
     def test_https_without_git_suffix_is_fixed(self, tmp_path: Path) -> None:
         answers = {
             "_src_path": "https://gitee.com/gooker_young/coopie",
@@ -76,10 +87,12 @@ class TestEnsureAnswersUrl:
         f = tmp_path / ".copier-answers.yml"
         f.write_text(yaml.dump(answers), encoding="utf-8")
 
-        _ensure_answers_url_normalized(f)
+        assert _resolve_answers_src_path(f) == "https://gitee.com/gooker_young/coopie.git"
 
         loaded = yaml.safe_load(f.read_text(encoding="utf-8"))
         assert loaded["_src_path"] == "https://gitee.com/gooker_young/coopie.git"
+        # 其余字段不应被改动
+        assert loaded["_commit"] == "v0.9.7"
 
     def test_https_already_has_git_suffix_not_touched(self, tmp_path: Path) -> None:
         answers = {
@@ -89,7 +102,7 @@ class TestEnsureAnswersUrl:
         f = tmp_path / ".copier-answers.yml"
         f.write_text(yaml.dump(answers), encoding="utf-8")
 
-        _ensure_answers_url_normalized(f)
+        assert _resolve_answers_src_path(f) == "https://gitee.com/gooker_young/coopie.git"
 
         loaded = yaml.safe_load(f.read_text(encoding="utf-8"))
         assert loaded["_src_path"] == "https://gitee.com/gooker_young/coopie.git"
@@ -102,24 +115,43 @@ class TestEnsureAnswersUrl:
         f = tmp_path / ".copier-answers.yml"
         f.write_text(yaml.dump(answers), encoding="utf-8")
 
-        _ensure_answers_url_normalized(f)
+        assert _resolve_answers_src_path(f) == "git@gitee.com:gooker_young/coopie.git"
 
         loaded = yaml.safe_load(f.read_text(encoding="utf-8"))
         assert loaded["_src_path"] == "git@gitee.com:gooker_young/coopie.git"
 
     def test_missing_file_is_skipped(self, tmp_path: Path) -> None:
-        _ensure_answers_url_normalized(tmp_path / "nonexistent.yml")
+        assert _resolve_answers_src_path(tmp_path / "nonexistent.yml") == ""
 
     def test_invalid_yaml_is_skipped(self, tmp_path: Path) -> None:
         f = tmp_path / ".copier-answers.yml"
         f.write_text(":::: invalid ::::", encoding="utf-8")
         # 不应抛异常
-        _ensure_answers_url_normalized(f)
+        assert _resolve_answers_src_path(f) == ""
 
     def test_non_dict_yaml_is_skipped(self, tmp_path: Path) -> None:
         f = tmp_path / ".copier-answers.yml"
         f.write_text("just a string", encoding="utf-8")
-        _ensure_answers_url_normalized(f)
+        assert _resolve_answers_src_path(f) == ""
+
+    def test_non_string_src_path_does_not_crash(self, tmp_path: Path) -> None:
+        """_src_path 类型非法（list/int）时应安全返回空串，不能抛 AttributeError."""
+        f = tmp_path / ".copier-answers.yml"
+        f.write_text("_src_path:\n  - a\n  - b\n", encoding="utf-8")
+        assert _resolve_answers_src_path(f) == ""
+
+        f2 = tmp_path / "int.yml"
+        f2.write_text("_src_path: 123\n", encoding="utf-8")
+        assert _resolve_answers_src_path(f2) == ""
+
+    def test_no_temp_file_left_behind(self, tmp_path: Path) -> None:
+        """原子写用完后不应留下 .tmp 残留文件."""
+        f = tmp_path / ".copier-answers.yml"
+        f.write_text(yaml.dump({"_src_path": "https://gitee.com/a/b"}), encoding="utf-8")
+
+        _resolve_answers_src_path(f)
+
+        assert list(tmp_path.iterdir()) == [f]
 
 
 # ---------------------------------------------------------------------------
@@ -144,9 +176,41 @@ def test_init_calls_copier_copy(monkeypatch: pytest.MonkeyPatch, tmp_path: Path)
     assert captured["dst_path"] == Path(dest).resolve()
     assert captured["vcs_ref"] is None
     assert captured["defaults"] is False
+    # 默认不自动 trust：避免静默执行远端模板的 Jinja/_tasks
+    assert captured.get("settings") is None
+
+
+def test_init_trust_flag_passes_settings(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    """显式 --trust 时才把模板源放进 copier Settings.trust."""
+    captured: dict[str, Any] = {}
+
+    def fake_run_copy(**kwargs: Any) -> None:
+        captured.update(kwargs)
+
+    monkeypatch.setattr("copier.run_copy", fake_run_copy)
+
+    dest = str(tmp_path / "my-project")
+    result = runner.invoke(app, ["init", dest, "--trust"])
+
+    assert result.exit_code == 0
     # trust 里包含模板 URL（仅 copier 9.17+ 有 Settings）
     if "settings" in captured and captured["settings"] is not None:
         assert DEFAULT_URL in captured["settings"].trust
+
+
+def test_init_copier_user_error(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    """copier 抛出 UserMessageError 应转为退出码 1（init 与 update 行为一致）."""
+    import copier.errors
+
+    def fake_run_copy(**kwargs: Any) -> None:
+        raise copier.errors.UserMessageError("模板源不可达")
+
+    monkeypatch.setattr("copier.run_copy", fake_run_copy)
+
+    result = runner.invoke(app, ["init", str(tmp_path / "my-project")])
+
+    assert result.exit_code == 1
+    assert "模板源不可达" in result.output
 
 
 def test_init_with_custom_url_normalized(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
@@ -229,7 +293,25 @@ def test_update_calls_copier_recopy(monkeypatch: pytest.MonkeyPatch, tmp_path: P
     assert captured["dst_path"] == project_dir.resolve()
     assert captured["vcs_ref"] is None
     assert captured["defaults"] is False
-    # trust 里包含 answers 中的 src_path（已被补成 .git，仅 copier 9.17+ 有 Settings）
+    # 默认不自动 trust：answers 里的模板源可能来自第三方仓库
+    assert captured.get("settings") is None
+
+
+def test_update_trust_flag_passes_settings(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    """显式 --trust 时才把 answers 中的模板源放进 Settings.trust."""
+    project_dir = tmp_path / "my-project"
+    _make_answers(project_dir)
+
+    captured: dict[str, Any] = {}
+
+    def fake_run_recopy(**kwargs: Any) -> None:
+        captured.update(kwargs)
+
+    monkeypatch.setattr("copier.run_recopy", fake_run_recopy)
+
+    result = runner.invoke(app, ["update", str(project_dir), "--trust"])
+
+    assert result.exit_code == 0
     if "settings" in captured and captured["settings"] is not None:
         assert "https://gitee.com/gooker_young/coopie.git" in captured["settings"].trust
 
@@ -408,24 +490,60 @@ def test_patch_vcs_fallback_to_vcs_module(monkeypatch: pytest.MonkeyPatch) -> No
 
 
 # ---------------------------------------------------------------------------
-# _read_answers_src_path 异常分支覆盖
+# _load_answers 异常分支覆盖
 # ---------------------------------------------------------------------------
 
 
-class TestReadAnswersSrcPath:
+class TestLoadAnswers:
     def test_normal_dict(self, tmp_path: Path) -> None:
         f = tmp_path / ".copier-answers.yml"
         f.write_text(yaml.dump({"_src_path": "https://github.com/a/b.git"}), encoding="utf-8")
-        assert _read_answers_src_path(f) == "https://github.com/a/b.git"
+        assert _load_answers(f) == {"_src_path": "https://github.com/a/b.git"}
 
     def test_yaml_parse_error_returns_empty(self, tmp_path: Path) -> None:
-        """YAML 解析失败应返回空字符串."""
+        """YAML 解析失败应返回空 dict."""
         f = tmp_path / ".copier-answers.yml"
         f.write_text(":::: not valid yaml ::::", encoding="utf-8")
-        assert _read_answers_src_path(f) == ""
+        assert _load_answers(f) == {}
 
     def test_non_dict_returns_empty(self, tmp_path: Path) -> None:
-        """YAML 解析结果不是 dict 应返回空字符串."""
+        """YAML 解析结果不是 dict 应返回空 dict."""
         f = tmp_path / ".copier-answers.yml"
         f.write_text("just a plain string", encoding="utf-8")
-        assert _read_answers_src_path(f) == ""
+        assert _load_answers(f) == {}
+
+    def test_missing_file_returns_empty(self, tmp_path: Path) -> None:
+        assert _load_answers(tmp_path / "nonexistent.yml") == {}
+
+
+# ---------------------------------------------------------------------------
+# patch 幂等性
+# ---------------------------------------------------------------------------
+
+
+def test_patch_vcs_is_idempotent() -> None:
+    """重复调用不应让 REPLACEMENTS 无限膨胀."""
+    vcs_mod = _get_vcs_module()
+    before = len(vcs_mod.REPLACEMENTS)
+
+    _patch_copier_vcs()
+    _patch_copier_vcs()
+
+    assert len(vcs_mod.REPLACEMENTS) == before
+    assert len(set(vcs_mod.GIT_PREFIX)) == len(vcs_mod.GIT_PREFIX)
+
+
+def test_patch_failure_is_swallowed(monkeypatch: pytest.MonkeyPatch) -> None:
+    """copier 内部结构变化导致 patch 失败时应静默降级，不能打断 CLI."""
+    import importlib
+
+    import coopie.cli as cli_module
+
+    def _boom(name: str) -> None:
+        raise ImportError(f"simulated copier layout change: {name}")
+
+    monkeypatch.setattr(importlib, "import_module", _boom)
+    monkeypatch.setattr(cli_module, "_VCS_PATCHED", False)
+
+    cli_module._ensure_copier_vcs_patched()  # 不应抛出
+    assert cli_module._VCS_PATCHED is True

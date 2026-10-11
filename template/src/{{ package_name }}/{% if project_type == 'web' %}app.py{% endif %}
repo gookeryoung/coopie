@@ -14,6 +14,15 @@ def read_root() -> dict[str, str]:
 
 
 if __name__ == "__main__":
+    import os
+
     import uvicorn
 
-    uvicorn.run("{{ package_name }}.app:app", host="0.0.0.0", port=8000, reload=True)
+    # 默认只监听回环地址、关闭 reload，避免开发配置直接暴露到公网；
+    # 需要对外暴露时用环境变量覆盖：UVICORN_HOST=0.0.0.0 UVICORN_RELOAD=1
+    uvicorn.run(
+        "{{ package_name }}.app:app",
+        host=os.getenv("UVICORN_HOST", "127.0.0.1"),
+        port=int(os.getenv("UVICORN_PORT", "8000")),
+        reload=os.getenv("UVICORN_RELOAD", "0") == "1",
+    )

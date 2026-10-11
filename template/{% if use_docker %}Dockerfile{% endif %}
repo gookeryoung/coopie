@@ -54,10 +54,20 @@ COPY pyproject.toml{% if use_tox %} tox.ini{% endif %} README.md ./
 COPY src/ ./src/
 
 # 同步依赖到 /opt/venv（CI 时直接复用）
-RUN uv sync --frozen --no-install-project 2>/dev/null || uv sync --no-install-project
+# 有 uv.lock 时用 --frozen 锁定版本保证可复现；没有则退化为常规解析（不要静默吞错）
+RUN if [ -f uv.lock ]; then \
+        uv sync --frozen --no-install-project; \
+    else \
+        uv sync --no-install-project; \
+    fi
 
 # 持久化 uv 缓存目录（CI 可挂载到宿主机加速）
 VOLUME ["/uv-cache"]
+
+# 以非 root 用户运行（最小权限）
+RUN useradd --create-home --uid 1000 appuser \
+    && chown -R appuser /workspace /uv-cache /opt/venv
+USER appuser
 
 # 默认入口
 CMD ["/bin/bash"]
