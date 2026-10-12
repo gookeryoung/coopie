@@ -3,7 +3,14 @@
 
 PACKAGE := coopie
 COV_THRESHOLD := 95
-PYTEST_JOBS := 8  # pytest-xdist 并行进程数；Windows 默认 8 避免句柄耗尽
+
+# min(cpu*2, 8)：≥4 核跑满 8 worker，低核数机器保守降档
+ifeq ($(OS),Windows_NT)
+CPUS := $(NUMBER_OF_PROCESSORS)
+else
+CPUS := $(shell nproc 2>/dev/null || echo 4)
+endif
+PYTEST_JOBS := $(if $(filter 0 1,$(CPUS)),2,$(if $(filter 2 3,$(CPUS)),4,8))
 
 .PHONY: help sync build b clean c test cov lint typecheck typecheck-ci check doc pub bump patch minor major push
 
