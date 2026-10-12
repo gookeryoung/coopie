@@ -13,9 +13,11 @@ from coopie.cli import (
     DEFAULT_URL,
     _ensure_copier_vcs_patched,
     _load_answers,
+    _NoCopierUserError,
     _normalize_url,
     _patch_copier_vcs,
     _resolve_answers_src_path,
+    _user_message_error_type,
     app,
 )
 
@@ -182,6 +184,14 @@ def test_init_calls_copier_copy(monkeypatch: pytest.MonkeyPatch, tmp_path: Path)
 
 def test_init_trust_flag_passes_settings(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     """显式 --trust 时才把模板源放进 copier Settings.trust."""
+
+    class _FakeSettings:
+        def __init__(self, trust: list[str]) -> None:
+            self.trust = trust
+
+    # 老版本 copier（9.x 早期）无 Settings：补假实现使断言确定性成立
+    monkeypatch.setattr("copier.Settings", _FakeSettings, raising=False)
+
     captured: dict[str, Any] = {}
 
     def fake_run_copy(**kwargs: Any) -> None:
@@ -193,9 +203,7 @@ def test_init_trust_flag_passes_settings(monkeypatch: pytest.MonkeyPatch, tmp_pa
     result = runner.invoke(app, ["init", dest, "--trust"])
 
     assert result.exit_code == 0
-    # trust 里包含模板 URL（仅 copier 9.17+ 有 Settings）
-    if "settings" in captured and captured["settings"] is not None:
-        assert DEFAULT_URL in captured["settings"].trust
+    assert captured["settings"].trust == [DEFAULT_URL]
 
 
 def test_init_copier_user_error(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
@@ -299,6 +307,14 @@ def test_update_calls_copier_recopy(monkeypatch: pytest.MonkeyPatch, tmp_path: P
 
 def test_update_trust_flag_passes_settings(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     """显式 --trust 时才把 answers 中的模板源放进 Settings.trust."""
+
+    class _FakeSettings:
+        def __init__(self, trust: list[str]) -> None:
+            self.trust = trust
+
+    # 老版本 copier（9.x 早期）无 Settings：补假实现使断言确定性成立
+    monkeypatch.setattr("copier.Settings", _FakeSettings, raising=False)
+
     project_dir = tmp_path / "my-project"
     _make_answers(project_dir)
 
@@ -312,8 +328,8 @@ def test_update_trust_flag_passes_settings(monkeypatch: pytest.MonkeyPatch, tmp_
     result = runner.invoke(app, ["update", str(project_dir), "--trust"])
 
     assert result.exit_code == 0
-    if "settings" in captured and captured["settings"] is not None:
-        assert "https://gitee.com/gooker_young/coopie.git" in captured["settings"].trust
+    # answers 里不带 .git 的 HTTPS URL 已被规范化后再传入 trust
+    assert captured["settings"].trust == ["https://gitee.com/gooker_young/coopie.git"]
 
 
 def test_update_fixes_answers_src_path_git_suffix(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
@@ -552,3 +568,52 @@ def test_patch_failure_is_swallowed(monkeypatch: pytest.MonkeyPatch) -> None:
 
     cli_module._ensure_copier_vcs_patched()  # 不应抛出
     assert cli_module._VCS_PATCHED is True
+
+
+# ---------------------------------------------------------------------------
+# Windows 平台分支与异常兜底覆盖
+# ---------------------------------------------------------------------------
+
+
+def test_user_message_error_type_fallback(monkeypatch: pytest.MonkeyPatch) -> None:
+    """copier 老版本无 UserMessageError 时应返回占位异常类型."""
+    import sys
+
+    # sys.modules 中置 None 会使 `from copier.errors import ...` 抛 ImportError
+    monkeypatch.setitem(sys.modules, "copier.errors", None)
+
+    assert _user_message_error_type() is _NoCopierUserError
+
+
+def test_windows_pythonutf8_env(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Windows 且未启用 UTF-8 模式时应设置 PYTHONUTF8=1."""
+    import os
+    from types import SimpleNamespace
+
+    import coopie.cli as cli_module
+
+    monkeypatch.delenv("PYTHONUTF8", raising=False)
+    # 仅替换 coopie.cli 命名空间内的 os/sys 引用，不触碰全局 sys.flags
+    monkeypatch.setattr(cli_module, "os", SimpleNamespace(name="nt", environ=os.environ))
+    monkeypatch.setattr(cli_module, "sys", SimpleNamespace(flags=SimpleNamespace(utf8_mode=0)))
+
+    cli_module._enable_windows_utf8()
+
+    assert os.environ.get("PYTHONUTF8") == "1"
+
+
+def test_windows_pythonutf8_env_skipped_when_utf8_mode_enabled(monkeypatch: pytest.MonkeyPatch) -> None:
+    """已显式启用 UTF-8 模式（-X utf8）时不应覆盖已有 PYTHONUTF8 设置."""
+    import os
+    from types import SimpleNamespace
+
+    import coopie.cli as cli_module
+
+    monkeypatch.setenv("PYTHONUTF8", "0")
+    monkeypatch.setattr(cli_module, "os", SimpleNamespace(name="nt", environ=os.environ))
+    monkeypatch.setattr(cli_module, "sys", SimpleNamespace(flags=SimpleNamespace(utf8_mode=1)))
+
+    cli_module._enable_windows_utf8()
+
+    # setdefault 语义：已有值不被覆盖
+    assert os.environ.get("PYTHONUTF8") == "0"

@@ -19,12 +19,6 @@ import sys
 from pathlib import Path
 from typing import Any, Optional
 
-# Windows 下 copier 派生的子进程（git 等）读非 ASCII 内容时可能因 GBK 区域触发
-# UnicodeDecodeError。注意：PEP 540 的 UTF-8 模式只在解释器启动时读取 PYTHONUTF8，
-# 进程内设置对本进程无效，仅对 copier 后续派生的子进程生效。
-if os.name == "nt" and not sys.flags.utf8_mode:
-    os.environ.setdefault("PYTHONUTF8", "1")
-
 import typer
 
 from coopie import __version__
@@ -33,6 +27,22 @@ __all__ = ["app", "main"]
 
 # 默认模板源（国内 Gitee，访问稳定）
 DEFAULT_URL = "https://gitee.com/gooker_young/coopie.git"
+
+
+def _enable_windows_utf8() -> None:
+    """Windows 下设置 PYTHONUTF8=1，避免 copier 子进程因 GBK 区域解码失败.
+
+    copier 派生的子进程（git 等）读非 ASCII 内容时可能因 GBK 区域触发
+    UnicodeDecodeError。注意：PEP 540 的 UTF-8 模式只在解释器启动时读取
+    PYTHONUTF8，进程内设置对本进程无效，仅对 copier 后续派生的子进程生效；
+    已显式启用 UTF-8 模式（-X utf8）时不重复设置。
+    """
+    if os.name == "nt" and not sys.flags.utf8_mode:
+        os.environ.setdefault("PYTHONUTF8", "1")
+
+
+# 导入时执行一次：copier 在命令函数内延迟导入，子进程派生前必须已生效
+_enable_windows_utf8()
 
 
 # ---------------------------------------------------------------------------
