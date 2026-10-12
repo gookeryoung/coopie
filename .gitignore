@@ -31,7 +31,7 @@ coverage.xml
 *_profile.html
 
 # 本地协作产物一律不入库
-.trae/
+.trae/*
 !.trae/rules/
 !.trae/skills/
 .claude/
