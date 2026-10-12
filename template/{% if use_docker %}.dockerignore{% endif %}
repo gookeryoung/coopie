@@ -21,6 +21,11 @@ htmlcov
 .tox
 coverage.xml
 
+# 工作区元数据
+.workbuddy
+.trae
+.claude
+
 # 虚拟环境
 .venv
 venv

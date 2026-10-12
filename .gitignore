@@ -17,17 +17,24 @@ coverage.xml
 .tox/
 
 # 工具缓存
-.ruff_cache/
-.pyrefly_cache/
+.eslintcache/
 .mypy_cache/
-.uv-cache/
 .pnpm-store/
+.pytest_cache/
+.pyrefly_cache/
+.ruff_cache/
+.uv-cache/
+.vitest-cache/
 
 # IDE
 .idea/
 *_profile.html
 
-# Agent 工作目录（勿提交）
+# 本地协作产物一律不入库
+.trae/
+!.trae/rules/
+!.trae/skills/
+.claude/
 .workbuddy/
 
 # 环境变量与凭证（勿提交）

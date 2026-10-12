@@ -26,6 +26,13 @@ coverage.xml
 .idea/
 *_profile.html
 
+# 本地协作产物一律不入库
+.trae/
+!.trae/rules/
+!.trae/skills/
+.claude/
+.workbuddy/
+
 # 环境变量与凭证（勿提交）
 .env
 .env.*
