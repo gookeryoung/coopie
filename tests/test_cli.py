@@ -484,9 +484,14 @@ def test_patch_vcs_fallback_to_vcs_module(monkeypatch: pytest.MonkeyPatch) -> No
     _patch_copier_vcs()
 
     # fallback 后 vcs 模块的 GIT_PREFIX 也应包含国内平台
-    from copier import vcs as vcs_mod
+    # copier 9.17+ 对旧 vcs 模块发出 DeprecationWarning，本测试刻意走该路径，局部忽略
+    import warnings
 
-    assert "https://gitee.com/" in vcs_mod.GIT_PREFIX
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", DeprecationWarning)
+        from copier import vcs as vcs_mod
+
+        assert "https://gitee.com/" in vcs_mod.GIT_PREFIX
 
 
 # ---------------------------------------------------------------------------
