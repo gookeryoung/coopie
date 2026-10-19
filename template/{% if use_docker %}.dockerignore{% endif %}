@@ -17,9 +17,40 @@ build
 # 测试与覆盖率
 .pytest_cache
 .coverage
+.coverage.*
 htmlcov
 .tox
 coverage.xml
+
+# 前端依赖与构建产物
+frontend/node_modules
+frontend/dist
+frontend/.vite
+frontend/coverage
+frontend/.eslintcache
+frontend/test-results
+frontend/playwright-report
+*.tsbuildinfo
+.e2e
+reports
+
+# 本地研究数据与模型产物
+data
+*.db
+*.db-wal
+*.db-shm
+*.sqlite
+*.parquet
+*.joblib
+*.pkl
+logs
+*.log
+
+# 运行期配置与备份归档
+.env
+.env.*
+backups
+
 
 # 工作区元数据
 .workbuddy
