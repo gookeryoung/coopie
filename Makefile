@@ -12,6 +12,9 @@ CPUS := $(shell nproc 2>/dev/null || echo 4)
 endif
 PYTEST_JOBS := $(if $(filter 0 1,$(CPUS)),2,$(if $(filter 2 3,$(CPUS)),4,8))
 
+# Override with: make push REMOTES="origin codeup"
+REMOTES = $(shell git remote)
+
 .PHONY: help sync build b clean c test cov lint typecheck typecheck-ci check doc pub bump patch minor major push
 
 help: ## Show this help
@@ -77,6 +80,6 @@ patch minor major:
 pub:  ## Upload to PyPI
 	uvx twine upload dist/*.whl dist/*.tar.gz
 
-push: ## Push code to all remotes
-	@uv run python -c "import subprocess as sp; [print(f'Pushing {r}...',flush=True) or (sp.run(['git','push',r],check=True) and sp.run(['git','push',r,'--tags'],check=True)) for r in sp.check_output(['git','remote'],text=True).split()]"
+push: ## Push code to all remotes (continues on failure, non-zero exit if any failed)
+	@uv run python -c "import subprocess as sp,sys; remotes='$(REMOTES)'.split(); failed=[]; [failed.append(r) for r in remotes if print(f'Pushing {r}...',flush=True) or sp.run(['git','push',r]).returncode or sp.run(['git','push',r,'--tags']).returncode]; print('Failed remotes: '+', '.join(failed) if failed else 'All remotes pushed.'); sys.exit(1 if failed else 0)"
 
