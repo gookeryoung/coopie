@@ -20,11 +20,43 @@ coverage.xml
 .eslintcache/
 .mypy_cache/
 .pnpm-store/
+.pytmp/
 .pytest_cache/
 .pyrefly_cache/
 .ruff_cache/
 .uv-cache/
 .vitest-cache/
+
+# --- Node / frontend ---
+node_modules/
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+frontend/coverage/
+frontend/.eslintcache
+frontend/package-lock.json
+*.tsbuildinfo
+package-lock.json
+
+# --- E2E（Playwright）---
+.e2e/
+frontend/test-results/
+frontend/playwright-report/
+frontend/e2e-report/
+reports/
+
+# --- Data & artifacts（绝不提交）---
+# 数据库为本地研究数据，体积可达数百 MB
+data/
+*.db
+*.db-wal
+*.db-shm
+*.sqlite
+*.parquet
+*.joblib
+*.pkl
+*.log
+logs/
 
 # IDE
 .idea/
@@ -37,9 +69,23 @@ coverage.xml
 .claude/
 .workbuddy/
 
-# 环境变量与凭证（勿提交）
+# --- OS / editor ---
+Thumbs.db
+desktop.ini
+.DS_Store
+.idea/
+.vscode/
+*.bak
+*backup-*.tar.gz
+pytest-of-*
+
+# --- 本地环境与凭证 ---
 .env
+.env.local
 .env.*
+# 示例配置必须入库（.env.* 会误伤它）
+!.env.example
+!deploy/.env.prod.example
 
 # Sphinx 文档构建输出
 docs/_build/
