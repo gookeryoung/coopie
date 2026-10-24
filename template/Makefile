@@ -8,7 +8,7 @@ PYTEST_JOBS := 8  # pytest-xdist worker count; 8 by default on Windows to avoid 
 # Override with: make push REMOTES="origin codeup"
 REMOTES = $(shell git remote)
 
-.PHONY: help sync build b clean c test cov lint typecheck typecheck-ci check{% if use_docs %} doc{% endif %}{% if use_tox %} tox{% endif %} pub bump patch minor major push
+.PHONY: help sync build b clean c test cov lint typecheck typecheck-ci check check-docs check-fast flow gitkeep-check adr-check prek{% if use_docs %} doc{% endif %}{% if use_tox %} tox{% endif %}{% if use_docker %} docker d{% endif %} pub bump patch minor major push
 
 help: ## Show this help
 	@uv run python -c "import re,sys;ms=[(m.group(1),m.group(2).strip()) for f in sys.argv[1:] for l in open(f,encoding='utf-8') if (m:=re.match(r'^([a-zA-Z][\w -]*):.*?##\s*(.*)',l))];[print(f'  {n:<14} {d}') for n,d in ms]" $(MAKEFILE_LIST)
@@ -20,7 +20,7 @@ build b: ## Build distribution packages (wheel + sdist)
 	uv build
 
 clean c: ## Remove build artifacts and caches
-	rm -rf build/ dist/ wheels/ *.egg-info htmlcov/ .coverage .coverage.* coverage.xml{% if use_docs %} docs/_build/{% endif %} .tox/
+	rm -rf build/ dist/ wheels/ *.egg-info htmlcov/ .coverage .coverage.* coverage.xml .pytest_cache/{% if use_docs %} docs/_build/{% endif %} .tox/
 	rm -rf .ruff_cache/ .pyrefly_cache/ .mypy_cache/
 	find src tests -type d -name __pycache__ -exec rm -rf {} +
 	find src tests -type f -name "*.py[oc]" -delete
@@ -42,8 +42,24 @@ typecheck: ## Type check (pyrefly)
 typecheck-ci: ## Type check (pyrefly, CI platform linux - catch cross-platform issues)
 	uv run pyrefly check --python-platform linux
 
-check: lint typecheck typecheck-ci cov ## Run the full gate (lint + typecheck + typecheck-ci + cov)
-{% if use_docs %}
+gitkeep-check: ## 校验占位目录未被清空（空目录须有 .gitkeep）
+	@uv run python -c "import pathlib,sys;ds=[p for p in map(pathlib.Path,['docs/adr','docs/requirements','docs/_static']) if p.is_dir()];bad=[str(p) for p in ds if not any(p.iterdir())];[print('gitkeep-check: 空目录缺少 .gitkeep -> '+b) for b in bad];print('gitkeep-check: 通过') if not bad else None;sys.exit(1 if bad else 0)"
+
+adr-check: ## 校验 ADR 编号/命名与索引登记
+	@uv run python -c "import pathlib,re,sys;d=pathlib.Path('docs/adr');fs=[p for p in sorted(d.glob('*.md')) if p.name!='README.md'] if d.is_dir() else [];ns=[p.name for p in fs];idx=(d/'README.md').read_text(encoding='utf-8') if (d/'README.md').is_file() else '';dups=sorted({n[:4] for n in ns if sum(m[:4]==n[:4] for m in ns)>1});bad=[f'{n}: 文件名应为 NNNN-<topic>.md' for n in ns if not re.fullmatch(r'\d{4}-[\w-]+\.md',n)]+[f'编号 {x} 重复' for x in dups]+(['docs/adr/README.md 缺失'] if fs and not (d/'README.md').is_file() else [])+[f'{n}: 未登记到 docs/adr/README.md 索引' for n in ns if n not in idx];[print('adr-check: '+b) for b in bad];print(f'adr-check: 通过（{len(fs)} 个 ADR）') if not bad else None;sys.exit(1 if bad else 0)"
+
+check-docs: gitkeep-check adr-check ## L0 文档门禁（gitkeep-check + adr-check）
+check-fast: gitkeep-check adr-check lint typecheck ## L1 配置/内环门禁（gitkeep + adr + lint + typecheck）
+flow: check-fast test ## L2 代码门禁（check-fast + test）
+
+check: check-fast typecheck-ci cov ## 全量门禁（check-fast + typecheck-ci + cov）
+
+prek: ## Run pre-commit hooks on all files (prek)
+	uv run prek run -a
+{% if use_docker %}
+docker d: ## Build the Docker image
+	docker build -t {{ package_name }}:latest .
+{% endif %}{% if use_docs %}
 doc: ## Build the Sphinx documentation
 	uv run sphinx-build -b html docs docs/_build/html
 {% endif %}
